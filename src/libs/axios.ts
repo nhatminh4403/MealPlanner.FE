@@ -98,7 +98,7 @@ export const login = async (
       client_id: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID ?? "MealPlannerAPI_App",
       username,
       password,
-      scope: "MealPlannerAPI offline_access",
+      scope: "MealPlannerAPI offline_access", 
     }),
   });
 

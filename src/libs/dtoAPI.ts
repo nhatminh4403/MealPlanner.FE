@@ -114,7 +114,25 @@ export const dashboard = {
 
   getRecent: () => api.get<Recipe[]>("/app/dashboard/recent"),
 };
-
+ 
+// ── Endpoint functions ────────────────────────────────────────────────────────
+ 
+export const ingredientNutritions = {
+  search: (query: string, includeExternal = false) =>
+    api.get<IngredientNutritionSearchResultDto>(
+      "/app/ingredient-nutritions/search",
+      { params: { query, includeExternal } }
+    ),
+ 
+  create: (data: CreateIngredientNutritionDto) =>
+    api.post<IngredientNutritionDto>("/app/ingredient-nutritions", data),
+ 
+  getList: (params?: { skipCount?: number; maxResultCount?: number }) =>
+    api.get<{ items: IngredientNutritionDto[]; totalCount: number }>(
+      "/app/ingredient-nutritions",
+      { params }
+    ),
+};
 // ── Stub types (replace with generated types or your DTO files) ───────────────
 // These keep the file self-contained during development.
 
@@ -220,4 +238,42 @@ export interface DashboardStats {
   totalFollowers: number;
   totalFollowing: number;
   averageRating: number;
+}
+export interface IngredientNutritionDto {
+  id:              string;
+  name:            string;
+  caloriesPer100g: number;
+  proteinPer100g:  number;
+  carbsPer100g:    number;
+  fatPer100g:      number;
+  fiberPer100g:    number;
+  isVerified:      boolean;
+}
+ 
+export interface ExternalFoodCandidateDto {
+  name:              string;
+  brand?:            string;
+  caloriesPer100g:   number;
+  proteinPer100g:    number;
+  carbsPer100g:      number;
+  fatPer100g:        number;
+  fiberPer100g:      number;
+  completenessScore: number;
+  externalId?:       string;
+  source:            string; // "USDA"
+}
+ 
+export interface IngredientNutritionSearchResultDto {
+  dbResults:          IngredientNutritionDto[];
+  externalCandidates: ExternalFoodCandidateDto[];
+}
+ 
+export interface CreateIngredientNutritionDto {
+  name:              string;
+  caloriesPer100g:   number;
+  proteinPer100g:    number;
+  carbsPer100g:      number;
+  fatPer100g:        number;
+  fiberPer100g:      number;
+  sourceExternalId?: string; // USDA fdcId
 }
