@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 
 
 export default function Home() {
@@ -11,6 +12,10 @@ export default function Home() {
         <p className="mt-4 text-zinc-600 dark:text-zinc-400">
           Your personalized dashboard and recipe management system is ready.
         </p>
+        
+      </div>
+      <div className="mx-auto max-w-7xl px-4">
+
       </div>
     </div>
   );

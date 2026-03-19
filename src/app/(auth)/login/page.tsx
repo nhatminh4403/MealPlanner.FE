@@ -1,9 +1,114 @@
-import React from 'react'
+"use client"
 
-export default function page() {
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { login } from '@/libs/axios'
+import { toast } from 'sonner'
+
+export default function Login() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      await login(email, password)
+      toast.success('Successfully logged in!')
+      router.push('/')
+      router.refresh()
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Login failed. Please check your credentials.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <div>
+    <Card className="shadow-2xl bg-background/60 backdrop-blur-xl relative overflow-hidden gradient-border-static">
+      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary to-secondary" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-primary to-secondary" />
+      <div className="absolute top-0 left-0 h-full w-1 bg-linear-to-r from-primary to-secondary" />
+      <div className="absolute top-0 right-0 h-full w-1 bg-linear-to-r from-primary to-secondary" />
       
-    </div>
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold tracking-tight text-center">
+          Welcome back
+        </CardTitle>
+        <CardDescription className="text-center">
+          Enter your email and password to sign in to your account
+        </CardDescription>
+      </CardHeader>
+      
+      <form onSubmit={handleSubmit}>
+        <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="name@example.com" 
+              className="bg-background/50" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link 
+                href="/forgot-password" 
+                className="text-sm font-medium text-primary hover:underline hover:text-primary/80 transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <Input 
+              id="password" 
+              type="password" 
+              className="bg-background/50" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="remember" />
+            <Label htmlFor="remember" className="text-sm font-medium leading-none cursor-pointer">
+              Remember me
+            </Label>
+          </div>
+        </CardContent>
+        
+        <CardFooter className="flex flex-col gap-4">
+          <Button 
+            type="submit"
+            className="w-full bg-linear-to-r from-primary to-secondary hover:opacity-90 border-none h-10 text-white font-semibold transition-all"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Signing In...' : 'Sign In'}
+          </Button>
+          <div className="text-center text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link 
+              href="/register" 
+              className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors"
+            >
+              Create an account
+            </Link>
+          </div>
+        </CardFooter>
+      </form>
+    </Card>
   )
 }

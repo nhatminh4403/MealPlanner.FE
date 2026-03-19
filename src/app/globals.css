@@ -53,12 +53,37 @@ body {
   z-index: -1;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-radius: inherit;
+  /* Compatibility mask setup */
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
   opacity: 0.65;
   transition: opacity 0.2s ease;
 }
 
 .gradient-border:hover::before {
   opacity: 1;
+}
+
+.gradient-border-static {
+  position: relative;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+
+.gradient-border-static::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.8;
 }
 
 /* Specific class for persistent borders where we toggle opacity */
