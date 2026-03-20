@@ -11,25 +11,78 @@ export interface PagedRequest {
   sorting?: string;
 }
 
-// ── Recipes ───────────────────────────────────────────────────────────────────// ── Stub types (replace with generated types or your DTO files) ───────────────
-// These keep the file self-contained during development.
+// ── Recipes ───────────────────────────────────────────────────────────────────
 
-export interface Recipe {
+/** DifficultyLevel: 0=Easy, 1=Medium, 2=Hard */
+export type DifficultyLevel = 0 | 1 | 2;
+
+export interface RecipeSummary {
   id: string;
   name: string;
-  description: string;
-  imageUrl?: string;
-  difficultyLevel: number;
-  prepTimeMinutes: number;
-  cookTimeMinutes: number;
+  cuisine: string;
+  difficulty: DifficultyLevel;
+  totalTimeMinutes: number;
   servings: number;
+  rating: number;
+  reviewCount: number;
+  imageUrl?: string;
+  description: string;
   tags: string[];
-  averageRating: number;
-  creationTime: string;
 }
 
-export interface CreateRecipeDto extends Omit<Recipe, "id" | "averageRating" | "creationTime"> {
-  ingredients: { name: string; quantity: string; unit: string }[];
+export interface TrendingRecipe {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  rating: number;
+  reviewCount: number;
+  trendingScore: number;
+  trendingSince: string;
+}
+
+export interface RecipeAuthor {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+}
+
+export interface RecipeIngredient {
+  id: string;
+  name: string;
+  quantityGrams: number;
+  displayQuantity?: string;
+  nutrition?: NutritionalInfo;
+}
+
+export interface NutritionalInfo {
+  calories: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+  fiberGrams: number;
+}
+
+export interface Recipe extends RecipeSummary {
+  cookingTimeMinutes: number;
+  prepTimeMinutes: number;
+  instructions: string[];
+  author: RecipeAuthor;
+  ingredients: RecipeIngredient[];
+  nutritionPerServing?: NutritionalInfo;
+}
+
+export interface CreateRecipeDto {
+  name: string;
+  cuisine: string;
+  difficulty: DifficultyLevel;
+  cookingTimeMinutes: number;
+  prepTimeMinutes: number;
+  servings: number;
+  description: string;
+  imageUrl?: string;
+  tags: string[];
+  instructions: string[];
+  ingredients: { name: string; quantity: number; unit: string }[];
 }
 
 export type UpdateRecipeDto = Partial<CreateRecipeDto>;

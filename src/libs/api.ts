@@ -1,13 +1,17 @@
 import { api } from "./axios";
-import { PagedRequest, PagedResult, Recipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, MealPlanEntry, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, ExternalFoodCandidateDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto } from "./interfaceDTO";
-
-
+import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, MealPlanEntry, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, ExternalFoodCandidateDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto } from "./interfaceDTO";
 
 export const recipes = {
-  getList: (params?: PagedRequest & { filter?: string }) =>
-    api.get<PagedResult<Recipe>>("/app/recipe", { params }),
+  getList: (params?: PagedRequest & { searchTerm?: string; cuisine?: string; difficulty?: number; maxTotalTimeMinutes?: number; vegetarian?: boolean; sorting?: string }) =>
+    api.get<PagedResult<RecipeSummary>>("/app/recipe", { params }),
 
   get: (id: string) => api.get<Recipe>(`/app/recipe/${id}`),
+
+  getTopRated: (count = 10) =>
+    api.get<{ items: RecipeSummary[] }>(`/app/recipe/top-rated`, { params: { count } }),
+
+  getByAuthor: (authorId: string) =>
+    api.get<{ items: RecipeSummary[] }>(`/app/recipe/by-author/${authorId}`),
 
   create: (data: CreateRecipeDto) => api.post<Recipe>("/app/recipe", data),
 
@@ -32,25 +36,25 @@ export const mealPlans = {
 // ── Shopping Lists ────────────────────────────────────────────────────────────
 
 export const shoppingLists = {
-  getList: () => api.get<PagedResult<ShoppingList>>("/app/shoppinglist"),
+  getList: () => api.get<PagedResult<ShoppingList>>("/app/shopping-lists"),
 
-  get: (id: string) => api.get<ShoppingList>(`/app/shoppinglist/${id}`),
+  get: (id: string) => api.get<ShoppingList>(`/app/shopping-lists/${id}`),
 
   create: (data: { name: string }) =>
-    api.post<ShoppingList>("/app/shoppinglist", data),
+    api.post<ShoppingList>("/app/shopping-lists", data),
 
-  delete: (id: string) => api.delete(`/app/shoppinglist/${id}`),
+  delete: (id: string) => api.delete(`/app/shopping-lists/${id}`),
 
   addItem: (listId: string, data: AddShoppingItemDto) =>
-    api.post<ShoppingList>(`/app/shoppinglist/${listId}/items`, data),
+    api.post<ShoppingList>(`/app/shopping-lists/${listId}/items`, data),
 
   toggleItem: (listId: string, itemId: string) =>
     api.patch<ShoppingListItem>(
-      `/app/shoppinglist/${listId}/items/${itemId}/toggle`
+      `/app/shopping-lists/${listId}/items/${itemId}/toggle`
     ),
 
   removeItem: (listId: string, itemId: string) =>
-    api.delete(`/app/shoppinglist/${listId}/items/${itemId}`),
+    api.delete(`/app/shopping-lists/${listId}/items/${itemId}`),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
@@ -70,27 +74,27 @@ export const notifications = {
 // ── User Profiles ─────────────────────────────────────────────────────────────
 
 export const userProfiles = {
-  getMe: () => api.get<UserProfile>("/app/users/me"),
+  getMe: () => api.get<UserProfile>("/app/user/me"),
 
-  getUser: (userId: string) => api.get<UserProfile>(`/app/users/${userId}`),
+  getUser: (userId: string) => api.get<UserProfile>(`/app/user/${userId}`),
 
   updateProfile: (data: UpdateProfileInfoDto) =>
-    api.patch<UserProfile>("/app/users/me", data),
+    api.patch<UserProfile>("/app/user/me", data),
 
   updateAvatar: (avatarUrl: string) =>
-    api.patch<UserProfile>("/app/users/me/avatar", { avatarUrl }),
+    api.patch<UserProfile>("/app/user/me/avatar", { avatarUrl }),
 
   updatePreferences: (data: UpdatePreferencesDto) =>
-    api.patch<UserProfile>("/app/users/me/preferences", data),
+    api.patch<UserProfile>("/app/user/me/preferences", data),
 
   changePassword: (data: ChangePasswordDto) =>
-    api.patch("/app/users/me/password", data),
+    api.patch("/app/user/me/password", data),
 
   follow: (userId: string) =>
-    api.post(`/app/users/${userId}/follow`),
+    api.post(`/app/user/${userId}/follow`),
 
   unfollow: (userId: string) =>
-    api.delete(`/app/users/${userId}/follow`),
+    api.delete(`/app/user/${userId}/follow`),
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -98,9 +102,8 @@ export const userProfiles = {
 export const dashboard = {
   getStats: () => api.get<DashboardStats>("/app/dashboard/stats"),
 
-  getTrending: () => api.get<Recipe[]>("/app/dashboard/trending"),
-
-  getRecent: () => api.get<Recipe[]>("/app/dashboard/recent"),
+  getTrending: () =>
+    api.get<{ items: TrendingRecipe[] }>("/app/dashboard/trending"),
 };
  
 // ── Endpoint functions ────────────────────────────────────────────────────────

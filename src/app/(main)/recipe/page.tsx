@@ -1,68 +1,335 @@
-'use client'
-import React, { useState, useEffect } from 'react'
-import { recipes as recipeApi } from '@/libs/api';
-import RecipeCardGrid from './components/RecipeCardGrid';
-import { Recipe } from '@/libs/interfaceDTO';
+"use client";
 
-export default function Page() {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
+import React, { useState, useEffect } from "react";
+import { recipes as recipeApi } from "@/libs/api";
+import { userProfiles } from "@/libs/api";
+import { getAccessToken } from "@/libs/axios";
+import RecipeCard from "./components/RecipeCard";
+import type { RecipeSummary } from "@/libs/interfaceDTO";
+import { User, Search, LayoutGrid } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+
+const PAGE_SIZE =10;
+
+export default function RecipePage() {
+  const [userRecipes, setUserRecipes] = useState<RecipeSummary[]>([]);
+  const [allRecipes, setAllRecipes] = useState<RecipeSummary[]>([]);
+  const [allRecipesTotal, setAllRecipesTotal] = useState(0);
+  const [allRecipesPage, setAllRecipesPage] = useState(1);
+  const [loading, setLoading] = useState({
+    userRecipes: true,
+    allRecipes: true,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const isLoggedIn = !!getAccessToken();
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
   useEffect(() => {
-    async function fetchRecipes() {
+    if (!isLoggedIn) {
+      setLoading((p) => ({ ...p, userRecipes: false }));
+      return;
+    }
+    async function fetchUserRecipes() {
       try {
-        const response = await recipeApi.getList();
-        // Assuming response.data contains the { items: Recipe[], totalCount: number } structure from dtoAPI
-        setRecipes(response.data.items);
-      } catch (error) {
-        console.error('Failed to fetch recipes:', error);
+        const me = await userProfiles.getMe();
+        const res = await recipeApi.getByAuthor(me.data.id);
+        setUserRecipes(res.data.items ?? []);
+      } catch {
+        setUserRecipes([]);
       } finally {
-        setLoading(false);
+        setLoading((p) => ({ ...p, userRecipes: false }));
       }
     }
-    fetchRecipes();
-  }, []);
+    fetchUserRecipes();
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    async function fetchAllRecipes() {
+      setLoading((p) => ({ ...p, allRecipes: true }));
+      try {
+        const res = await recipeApi.getList({
+          maxResultCount: PAGE_SIZE,
+          skipCount: (allRecipesPage - 1) * PAGE_SIZE,
+          searchTerm: searchTerm || undefined,
+          sorting: searchTerm ? undefined : "rating desc",
+        });
+        setAllRecipes(res.data.items ?? []);
+        setAllRecipesTotal(res.data.totalCount ?? 0);
+      } catch {
+        setAllRecipes([]);
+        setAllRecipesTotal(0);
+      } finally {
+        setLoading((p) => ({ ...p, allRecipes: false }));
+      }
+    }
+    fetchAllRecipes();
+    if (!loading.allRecipes) {
+      // Let the new data paint first, THEN fade back in
+      const t = setTimeout(() => setIsPageTransitioning(false), 80);
+      return () => clearTimeout(t);
+    }
+  }, [allRecipesPage, searchTerm, loading.allRecipes]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchTerm(searchInput);
+    setAllRecipesPage(1); // Reset to first page when search changes
+  };
+  const changePage = (newPage: number) => {
+    if (newPage === allRecipesPage) return;
+    setIsPageTransitioning(true);
+    setTimeout(() => {
+      setAllRecipesPage(newPage);
+    }, 500); // short delay before fetch triggers
+  };
+
+  const totalAllPages = Math.ceil(allRecipesTotal / PAGE_SIZE) || 1;
+  const hasPrevPage = allRecipesPage > 1;
+  const hasNextPage = allRecipesPage < totalAllPages;
+
+  const getPageNumbers = () => {
+    if (totalAllPages <= 7)
+      return [...Array(totalAllPages)].map((_, i) => i + 1);
+    const pages: (number | "ellipsis")[] = [];
+    if (allRecipesPage <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push("ellipsis", totalAllPages);
+    } else if (allRecipesPage >= totalAllPages - 3) {
+      pages.push(1, "ellipsis");
+      for (let i = totalAllPages - 4; i <= totalAllPages; i++) pages.push(i);
+    } else {
+      pages.push(
+        1,
+        "ellipsis",
+        allRecipesPage - 1,
+        allRecipesPage,
+        allRecipesPage + 1,
+        "ellipsis",
+        totalAllPages,
+      );
+    }
+    return pages;
+  };
+
+  const SectionSkeleton = ({ count = 4 }: { count?: number }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse p-1">
+      {[...Array(count)].map((_, i) => (
+        <div
+          key={i}
+          className="rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+        >
+          <div className="aspect-4/3 bg-zinc-200 dark:bg-zinc-700" />
+          <div className="p-4 space-y-2">
+            <div className="h-5 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4" />
+            <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Recipes</h1>
-      <p className="text-zinc-500 mb-8">Discover and manage your recipes.</p>
-      {/* <div className="mb-8">
-        <RecipeCardGrid></RecipeCardGrid>
-      </div> */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-32 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map((recipe) => (
-            <div 
-              key={recipe.id} 
-              className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer group"
-            >
-              <h2 className="font-semibold text-lg text-zinc-900 dark:text-white group-hover:text-blue-500 transition-colors">
-                {recipe.name}
+    <div className="w-full max-w-[1600] mx-auto px-4 sm:px-6 pt-24 pb-16 flex flex-col gap-12 h-screen max-h-screen overflow-hidden">
+      {/* Search Header - Stationary */}
+      <div className="shrink-0">
+        <h1 className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">
+          Browse Recipes
+        </h1>
+        <form onSubmit={handleSearch} className="mt-6 flex gap-3 max-w-2xl">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <Input
+              placeholder="Search recipes..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-10 h-11"
+            />
+          </div>
+          <Button
+            type="submit"
+            size="lg"
+            className="px-8 transition-all active:scale-95"
+          >
+            Search
+          </Button>
+        </form>
+      </div>
+
+      <div className="flex-1 flex flex-col min-h-0 gap-8 overflow-hidden">
+        {/* My Creations Section - Contained Scroll */}
+        {isLoggedIn && (
+          <section className="flex flex-col min-h-0 max-h-[40%]">
+            <div className="flex items-center gap-3 mb-4 shrink-0 px-1">
+              <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                <User className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                My Creations
               </h2>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
-                {recipe.description}
-              </p>
-              <div className="mt-4 flex items-center gap-4 text-xs text-zinc-400 dark:text-zinc-500">
-                <span>{recipe.prepTimeMinutes + recipe.cookTimeMinutes} mins</span>
-                <span>•</span>
-                <span>Difficulty: {recipe.difficultyLevel}/5</span>
+            </div>
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20 p-4">
+              {loading.userRecipes ? (
+                <SectionSkeleton count={10} />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-1">
+                  {userRecipes.map((recipe) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} />
+                  ))}
+                  {userRecipes.length === 0 && (
+                    <div className="col-span-full py-12 text-center">
+                      <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                        No recipes yet. Start sharing!
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* All Recipes Section - Contained Scroll */}
+        <section className="flex flex-col min-h-0 flex-1">
+          <div className="flex items-center justify-between mb-4 shrink-0 px-1">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 rounded-lg bg-secondary/10 text-secondary">
+                <LayoutGrid className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                {searchTerm ? `Results for "${searchTerm}"` : "All Recipes"}
+              </h2>
+            </div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              {allRecipesTotal} found
+            </p>
+          </div>
+
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20">
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
+              {/* Skeleton overlay during load */}
+              <div
+                className={`absolute inset-0 z-10 bg-white/40 dark:bg-black/40 backdrop-blur-[1px] transition-opacity duration-300 pointer-events-none rounded-2xl ${
+                  isPageTransitioning ? "opacity-100" : "opacity-0"
+                }`}
+              />
+
+              {/* Actual content fades in */}
+              <div
+                className={`transition-opacity duration-300 ${
+                  isPageTransitioning ? "opacity-30" : "opacity-100"
+                }`}
+              >
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 p-1"
+                  key={allRecipesPage}
+                >
+                  {allRecipes.map((recipe) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} />
+                  ))}
+                </div>
               </div>
             </div>
-          ))}
-          {recipes.length === 0 && (
-            <div className="col-span-full py-20 text-center text-zinc-500">
-              No recipes found.
+          </div>
+
+          {/* Pagination - Stationary below the scrollable container */}
+          {totalAllPages > 1 && (
+            <div className="shrink-0 pt-8 flex justify-center">
+              <Pagination className="w-auto mx-0">
+                <div className="gradient-border-static rounded-full p-1 px-2 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md shadow-lg shadow-primary/5">
+                  <PaginationContent className="gap-1">
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (hasPrevPage) changePage(allRecipesPage - 1);
+                        }}
+                        className={
+                          !hasPrevPage
+                            ? "pointer-events-none opacity-40"
+                            : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                        }
+                      />
+                    </PaginationItem>
+
+                    {getPageNumbers().map((page, idx) => (
+                      <PaginationItem key={idx}>
+                        {page === "ellipsis" ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            href="#"
+                            isActive={page === allRecipesPage}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              changePage(page as number);
+                            }}
+                            className={`rounded-full transition-all duration-300 ${
+                              page === allRecipesPage
+                                ? "bg-linear-to-br from-primary to-secondary text-white border-none shadow-md shadow-primary/20 scale-105"
+                                : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            }`}
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (hasNextPage) changePage(allRecipesPage + 1);
+                        }}
+                        className={
+                          !hasNextPage
+                            ? "pointer-events-none opacity-40"
+                            : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </div>
+              </Pagination>
             </div>
           )}
-        </div>
-      )}
-        </div>
-  )
+        </section>
+      </div>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `}</style>
+    </div>
+  );
 }

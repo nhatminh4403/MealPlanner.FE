@@ -4,6 +4,7 @@ import type React from "react";
 import {
     createContext,
     useContext,
+    useEffect,
     useState,
     type ReactNode,
 } from "react";
@@ -36,12 +37,15 @@ const getInitialTheme = (): Theme => {
 };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState<Theme>(() => {
+    // Always use "light" for initial SSR + first client render to avoid hydration mismatch.
+    // Real theme is applied by the inline script in layout.tsx and synced here after mount.
+    const [theme, setTheme] = useState<Theme>("light");
+
+    useEffect(() => {
         const initial = getInitialTheme();
-        // Apply immediately during initialization to avoid flash
-        if (typeof window !== "undefined") applyTheme(initial);
-        return initial;
-    });
+        setTheme(initial);
+        applyTheme(initial);
+    }, []);
 
     const toggleTheme = () => {
         const newTheme = theme === "light" ? "dark" : "light";
