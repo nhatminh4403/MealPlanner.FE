@@ -1,5 +1,5 @@
 import { api } from "./axios";
-import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, MealPlanEntry, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, ExternalFoodCandidateDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto } from "./interfaceDTO";
+import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, ExternalFoodCandidateDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto } from "./interfaceDTO";
 
 export const recipes = {
   getList: (params?: PagedRequest & { searchTerm?: string; cuisine?: string; difficulty?: number; maxTotalTimeMinutes?: number; vegetarian?: boolean; sorting?: string }) =>
@@ -61,14 +61,14 @@ export const shoppingLists = {
 
 export const notifications = {
   getList: (params?: PagedRequest) =>
-    api.get<PagedResult<UserNotification>>("/app/notifications", { params }),
+    api.get<PagedResult<UserNotification>>("/app/notification", { params }),
 
   markRead: (id: string) =>
-    api.patch(`/app/notifications/${id}/mark-read`),
+    api.patch(`/app/notification/${id}/mark-read`),
 
-  markAllRead: () => api.patch("/app/notifications/mark-all-read"),
+  markAllRead: () => api.patch("/app/notification/mark-all-read"),
 
-  delete: (id: string) => api.delete(`/app/notifications/${id}`),
+  delete: (id: string) => api.delete(`/app/notification/${id}`),
 };
 
 // ── User Profiles ─────────────────────────────────────────────────────────────
@@ -105,19 +105,19 @@ export const dashboard = {
   getTrending: () =>
     api.get<{ items: TrendingRecipe[] }>("/app/dashboard/trending"),
 };
- 
+
 // ── Endpoint functions ────────────────────────────────────────────────────────
- 
+
 export const ingredientNutritions = {
   search: (query: string, includeExternal = false) =>
     api.get<IngredientNutritionSearchResultDto>(
       "/app/ingredient-nutritions/search",
       { params: { query, includeExternal } }
     ),
- 
+
   create: (data: CreateIngredientNutritionDto) =>
     api.post<IngredientNutritionDto>("/app/ingredient-nutritions", data),
- 
+
   getList: (params?: { skipCount?: number; maxResultCount?: number }) =>
     api.get<{ items: IngredientNutritionDto[]; totalCount: number }>(
       "/app/ingredient-nutritions",
