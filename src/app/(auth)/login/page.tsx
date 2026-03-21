@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 
 export default function Login() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [usernameOrEmail, setUsernameOrEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -22,7 +22,7 @@ export default function Login() {
     setIsLoading(true)
     
     try {
-      await login(email, password)
+      await login(usernameOrEmail, password)
       toast.success('Successfully logged in!')
       router.push('/')
       router.refresh()
@@ -45,21 +45,21 @@ export default function Login() {
           Welcome back
         </CardTitle>
         <CardDescription className="text-center">
-          Enter your email and password to sign in to your account
+          Enter your email or username and password to sign in
         </CardDescription>
       </CardHeader>
       
       <form onSubmit={handleSubmit}>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="identifier">Email or Username</Label>
             <Input 
-              id="email" 
-              type="email" 
-              placeholder="name@example.com" 
+              id="identifier" 
+              type="text" 
+              placeholder="Email or username" 
               className="bg-background/50" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={usernameOrEmail}
+              onChange={(e) => setUsernameOrEmail(e.target.value)}
               required
             />
           </div>
@@ -82,7 +82,7 @@ export default function Login() {
               required
             />
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 mb-2 pb-1">
             <Checkbox id="remember" />
             <Label htmlFor="remember" className="text-sm font-medium leading-none cursor-pointer">
               Remember me
