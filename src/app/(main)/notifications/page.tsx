@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotifications } from "@/libs/NotificationProvider";
+import { isAuthenticated } from "@/libs/axios";
+import { useRouter } from "next/navigation";
 
 const TYPE_CONFIG: Record<
   string,
@@ -50,11 +52,22 @@ function getTypeConfig(type?: string) {
 }
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const [items, setItems] = useState<UserNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [draggedId, setDraggedId] = useState<string | null>(null);
-  const { unreadCount, notifyChanges, refreshKey } = useNotifications();
+  const { unreadCount, refreshKey } = useNotifications();
+  // const { unreadCount, notifyChanges, refreshKey } = useNotifications();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push("/login");
+      return;
+    }
+  }, [router]);
+
   const loadNotifications = async () => {
+    if (!isAuthenticated()) return;
     try {
       const res = await notifications.getList({ maxResultCount: 100 });
       setItems(res.data.items);
@@ -75,7 +88,7 @@ export default function NotificationsPage() {
       setItems((prev) =>
         prev.map((i) => (i.id === id ? { ...i, isRead: true } : i))
       );
-      notifyChanges();
+      // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as read", error);
       toast.error("Failed to mark as read");
@@ -88,7 +101,7 @@ export default function NotificationsPage() {
       setItems((prev) =>
         prev.map((i) => (i.id === id ? { ...i, isRead: false } : i))
       );
-      notifyChanges();
+      // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as unread", error);
       toast.error("Failed to mark as unread");
@@ -102,7 +115,7 @@ export default function NotificationsPage() {
       setItems((prev) => prev.filter((i) => i.id !== id));
       
       if (itemToDelete && !itemToDelete.isRead) {
-        notifyChanges();
+        // notifyChanges();
       }
       toast.success("Notification deleted");
     } catch (error) {

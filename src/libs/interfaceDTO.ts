@@ -15,6 +15,8 @@ export interface PagedRequest {
 
 /** DifficultyLevel: 0=Easy, 1=Medium, 2=Hard */
 export type DifficultyLevel = 0 | 1 | 2;
+export type VisibilityLevel = 0 | 1 | 2; // 0=Private, 1=FriendsOnly, 2=Public
+
 
 export interface RecipeSummary {
   id: string;
@@ -130,7 +132,7 @@ export interface AddShoppingItemDto {
 
 export interface UserNotification {
   id: string;
-  title?: string;
+  title: string;
   message: string;
   type: string;
   isRead: boolean;
@@ -208,4 +210,29 @@ export interface CreateIngredientNutritionDto {
   fatPer100g:        number;
   fiberPer100g:      number;
   sourceExternalId?: string; // USDA fdcId
+}
+
+// ── User Settings ─────────────────────────────────────────────────────────────
+
+export interface UserPrivacy {
+  profileVisibility: VisibilityLevel;
+  recipesVisibility: VisibilityLevel;
+  shoppingListVisibility: VisibilityLevel;
+}
+
+export interface UserNotificationPreferences {
+  mealReminders: boolean;
+  recipeUpdates: boolean;
+  communityActivity: boolean;
+  shoppingListAlerts: boolean;
+}
+
+export interface UserSettings {
+  privacy: UserPrivacy;
+  notifications: UserNotificationPreferences;
+}
+
+export interface CreateUpdateUserSettingsDto {
+  privacy: UserPrivacy;
+  notifications: UserNotificationPreferences;
 }

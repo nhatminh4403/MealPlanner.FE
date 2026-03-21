@@ -8,7 +8,8 @@ export const api = axios.create({
 });
 
 // Attach token on every request
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => { 
+  if (typeof window === "undefined") return config; 
   const token = getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;

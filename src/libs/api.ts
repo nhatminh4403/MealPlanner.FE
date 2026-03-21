@@ -1,5 +1,7 @@
 import { api } from "./axios";
-import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, ExternalFoodCandidateDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto } from "./interfaceDTO";
+import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto, UserSettings, CreateUpdateUserSettingsDto } from "./interfaceDTO";
+
+
 
 export const recipes = {
   getList: (params?: PagedRequest & { searchTerm?: string; cuisine?: string; difficulty?: number; maxTotalTimeMinutes?: number; vegetarian?: boolean; sorting?: string }) =>
@@ -63,8 +65,8 @@ export const notifications = {
   getList: (params?: PagedRequest) =>
     api.get<PagedResult<UserNotification>>("/app/notification", { params }),
   
-  getUnreadNotificationCount: () =>
-    api.get<number>("/app/notification/unread-count"),
+  // getUnreadNotificationCount: () =>
+  //   api.get<number>("/app/notification/unread-count"),
   
   markRead: (id: string) =>
     api.patch(`/app/notification/${id}/read`),
@@ -130,3 +132,11 @@ export const ingredientNutritions = {
       { params }
     ),
 };
+
+// ── User Settings ─────────────────────────────────────────────────────────────
+
+export const userSettings = {
+  get: () => api.get<UserSettings>("/app/user/settings"),
+  update: (data: CreateUpdateUserSettingsDto) => api.put<UserSettings>("/app/user/settings", data),
+};
+

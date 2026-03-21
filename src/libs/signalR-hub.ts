@@ -20,6 +20,7 @@ export const getHubConnection = (): signalR.HubConnection => {
           : signalR.LogLevel.Error
       )
       .build();
+
   }
   return connection;
 };
@@ -54,4 +55,7 @@ export const HubEvents = {
   MealPlanUpdated: "MealPlanUpdated",
   ShoppingListUpdated: "ShoppingListUpdated",
   ShoppingItemToggled: "ShoppingItemToggled",
+  NotificationReceived: "NotificationReceived",
+  UnreadCountChanged: "UnreadCountChanged",
 } as const;
+export type HubEventName = (typeof HubEvents)[keyof typeof HubEvents];

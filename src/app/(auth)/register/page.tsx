@@ -37,7 +37,8 @@ export default function Register() {
         userName: formData.email, // ABP usually uses email as username or requires both
         emailAddress: formData.email,
         password: formData.password,
-        name: formData.name
+        name: formData.name,
+        appName: "MealPlanner"
       })
       toast.success('Registration successful! Please sign in.')
       router.push('/login')
