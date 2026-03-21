@@ -30,10 +30,14 @@ export default function RecipePage() {
     userRecipes: true,
     allRecipes: true,
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const isLoggedIn = !!getAccessToken();
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
+
+  useEffect(()=> {
+    setIsLoggedIn(!!getAccessToken());
+  },[])
 
   useEffect(() => {
     if (!isLoggedIn) {

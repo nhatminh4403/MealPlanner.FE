@@ -72,7 +72,7 @@ export default function RecipeDetailPage() {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
         <p className="text-zinc-600 dark:text-zinc-400 mb-4">{error ?? "Recipe not found."}</p>
-        <Button variant="outline" onClick={() => router.push("/recipe")}>
+        <Button variant="outline" onClick={() => router.push("/recipe")} className="cursor-default">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Recipes
         </Button>
