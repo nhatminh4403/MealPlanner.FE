@@ -47,6 +47,8 @@ const REFRESH_TOKEN_KEY = "refresh_token";
 export const getAccessToken = () =>
   typeof window !== "undefined" ? localStorage.getItem(ACCESS_TOKEN_KEY) : null;
 
+export const isAuthenticated = () => !!getAccessToken();
+
 export const setTokens = (accessToken: string, refreshToken: string) => {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);

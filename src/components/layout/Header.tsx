@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import React, { useState, useRef, useEffect, useTransition } from "react";
 import { useTheme } from "@/libs/ThemeProvider";
 import { NotificationDropdown } from "./NotificationDropdown";
+import { logout, isAuthenticated } from "@/libs/axios";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/recipe", label: "Recipes" },
-  { href: "/meal-plans", label: "Meal Plans" },
-  { href: "/shopping-lists", label: "Shopping Lists" },
+  { href: "/meal-plans", label: "Meal Plans", requiresAuth: true },
+  { href: "/shopping-lists", label: "Shopping Lists", requiresAuth: true },
 ];
 
 export default function Header() {
@@ -20,6 +21,17 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [, startTransition] = useTransition();
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    startTransition(() => {
+      setIsMounted(true);
+    });
+  }, [startTransition]);
+
+  const isLoggedIn = isMounted && isAuthenticated();
+
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -59,7 +71,8 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden h-full items-center space-x-1 md:flex">
-            {NAV_LINKS.map((link) => {
+            {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
+              (link) => {
               const isActive =
                 pathname === link.href ||
                 (pathname?.startsWith(link.href) && link.href !== "/");
@@ -68,11 +81,12 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`group relative flex h-full items-center px-4 text-sm font-semibold transition-all duration-150 ${
-                    isActive
-                      ? "text-zinc-900 bg-active-gradient dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900/40"
-                  }`}
+                  className={`group relative flex h-full items-center px-4 text-sm
+                     font-semibold transition-all duration-150 ${
+                       isActive
+                         ? "text-zinc-900 bg-active-gradient dark:text-white"
+                         : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900/40"
+                     }`}
                 >
                   {!isActive && (
                     <div className="gradient-border-persistent group-hover:opacity-10" />
@@ -146,40 +160,81 @@ export default function Header() {
                 aria-expanded={isDropdownOpen}
                 aria-haspopup="true"
               >
-                {/* Stub for User Avatar */}
-                <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-                  U
-                </span>
+                {isLoggedIn ? (
+                  <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+                    U
+                  </span>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-zinc-500"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                )}
               </button>
 
               {/* Dropdown Menu */}
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-zinc-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                      User Name
-                    </p>
-                    <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                      user@example.com
-                    </p>
-                  </div>
-                  <div className="py-1">
-                    <Link
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      Settings
-                    </Link>
-                  </div>
-                  <div className="border-t border-zinc-100 py-1 dark:border-zinc-800">
-                    <button
-                      className="block w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      Sign out
-                    </button>
-                  </div>
+                  {isLoggedIn ? (
+                    <>
+                      <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                          User Name
+                        </p>
+                        <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                          user@example.com
+                        </p>
+                      </div>
+                      <div className="py-1">
+                        <Link
+                          href="/settings"
+                          className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                      </div>
+                      <div className="border-t border-zinc-100 py-1 dark:border-zinc-800">
+                        <button
+                          className="block w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            logout();
+                          }}
+                        >
+                          Sign out
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="py-1">
+                      <Link
+                        href="/login"
+                        className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Sign in
+                      </Link>
+                      <Link
+                        href="/register"
+                        className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -242,7 +297,8 @@ export default function Header() {
           <div className="absolute top-16 left-0 right-0 border-b border-zinc-200 bg-white/95 backdrop-blur-md shadow-xl transition-colors duration-300 dark:border-zinc-800 dark:bg-zinc-950/95">
             {/* Nav Links */}
             <nav className="flex flex-col px-4 py-3">
-              {NAV_LINKS.map((link) => {
+              {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
+                (link) => {
                 const isActive =
                   pathname === link.href ||
                   (pathname?.startsWith(link.href) && link.href !== "/");
@@ -270,30 +326,49 @@ export default function Header() {
             <div className="mx-4 border-t border-zinc-100 dark:border-zinc-800" />
 
             {/* User section */}
-            <div className="flex items-center justify-between px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="gradient-border flex h-9 w-9 items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800">
-                  <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-                    U
-                  </span>
+            {isLoggedIn ? (
+              <div className="flex items-center justify-between px-4 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="gradient-border flex h-9 w-9 items-center justify-center rounded-full bg-zinc-200 dark:bg-zinc-800">
+                    <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+                      U
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-white">
+                      User Name
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      user@example.com
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                    User Name
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    user@example.com
-                  </p>
-                </div>
+                <Link
+                  href="/settings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                >
+                  Settings
+                </Link>
               </div>
-              <Link
-                href="/settings"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              >
-                Settings
-              </Link>
-            </div>
+            ) : (
+              <div className="flex items-center gap-4 px-8 py-6">
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex-1 rounded-xl bg-zinc-100 py-2.5 text-center text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex-1 rounded-xl bg-linear-to-r from-primary to-secondary py-2.5 text-center text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

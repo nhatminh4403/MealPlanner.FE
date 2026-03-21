@@ -130,8 +130,9 @@ export interface AddShoppingItemDto {
 
 export interface UserNotification {
   id: string;
+  title?: string;
   message: string;
-  type: number;
+  type: string;
   isRead: boolean;
   creationTime: string;
 }

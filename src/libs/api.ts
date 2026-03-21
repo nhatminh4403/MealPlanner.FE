@@ -62,11 +62,17 @@ export const shoppingLists = {
 export const notifications = {
   getList: (params?: PagedRequest) =>
     api.get<PagedResult<UserNotification>>("/app/notification", { params }),
-
+  
+  getUnreadNotificationCount: () =>
+    api.get<number>("/app/notification/unread-count"),
+  
   markRead: (id: string) =>
-    api.patch(`/app/notification/${id}/mark-read`),
+    api.patch(`/app/notification/${id}/read`),
 
-  markAllRead: () => api.patch("/app/notification/mark-all-read"),
+  markUnread: (id: string) =>
+    api.patch(`/app/notification/${id}/unread`),
+
+  markAllRead: () => api.patch("/app/notification/read-all"),
 
   delete: (id: string) => api.delete(`/app/notification/${id}`),
 };

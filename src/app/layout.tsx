@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/libs/ThemeProvider";
+import { NotificationProvider } from "@/libs/NotificationProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -51,16 +52,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 text-zinc-900 transition-colors duration-300 dark:bg-black dark:text-zinc-50`}
       >
         <ThemeProvider>
-          <div className="relative flex min-h-screen flex-col font-sans">
-            <div className="bg-gradient-mesh pointer-events-none fixed inset-0 z-0" />
-            <div className="relative z-10 flex flex-1 flex-col">
-              <Header />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
+          <NotificationProvider>
+            <div className="relative flex min-h-screen flex-col font-sans">
+              <div className="bg-gradient-mesh pointer-events-none fixed inset-0 z-0" />
+              <div className="relative z-10 flex flex-1 flex-col">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </div>
-          </div>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
