@@ -3,25 +3,27 @@
 import { useEffect, useRef, useLayoutEffect } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
 import { getHubConnection, startHub, stopHub, HubEvents } from "./signalR-hub";
-import { UserNotification } from "./interfaceDTO";
+import { UserNotification, MealPlan, ShoppingList, ShoppingListItem, DashboardStats } from "./interfaceDTO";
 
 type HubEventHandlers = Partial<{
   onTrendingUpdated: () => void;
-  onStatsUpdated: (stats: unknown) => void;
-  onMealPlanUpdated: (mealPlan: unknown) => void;
-  onShoppingListUpdated: (shoppingList: unknown) => void;
-  onShoppingItemToggled: (shoppingListId: string, item: unknown) => void;
+  onStatsUpdated: (stats: DashboardStats) => void;
+  onMealPlanUpdated: (mealPlan: MealPlan) => void;
+  onShoppingListUpdated: (shoppingList: ShoppingList) => void;
+  onShoppingItemToggled: (shoppingListId: string, item: ShoppingListItem) => void;
   onNotificationReceived: (notification: UserNotification) => void;
   onUnreadCountChanged: (count: number) => void;
 }>;
 
-export const useHub = (handlers: HubEventHandlers = {}) => {
+export const useHub = (handlers: HubEventHandlers = {}, enabled = true) => {
   const handlersRef = useRef(handlers);
   useLayoutEffect(() => {
+    // if (!enabled) return;
     handlersRef.current = handlers;
   });
 
   useEffect(() => {
+    if (!enabled) return;
     const hub = getHubConnection();
 
     const wrap =
@@ -63,5 +65,5 @@ export const useHub = (handlers: HubEventHandlers = {}) => {
         if (!hasListeners) stopHub().catch(console.error);
       }
     };
-  }, []);
+  }, [enabled]);
 };

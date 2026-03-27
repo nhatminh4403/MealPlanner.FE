@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { recipes as recipeApi } from "@/libs/api";
 import { userProfiles } from "@/libs/api";
 import { getAccessToken } from "@/libs/axios";
-import RecipeCard from "./components/RecipeCard";
+import RecipeCard from "../../../components/recipes/RecipeCard";
 import type { RecipeSummary } from "@/libs/interfaceDTO";
 import { User, Search, LayoutGrid } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 
-const PAGE_SIZE =10;
+const PAGE_SIZE = 10;
 
 export default function RecipePage() {
   const [userRecipes, setUserRecipes] = useState<RecipeSummary[]>([]);
@@ -35,9 +35,9 @@ export default function RecipePage() {
   const [searchInput, setSearchInput] = useState("");
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
-  useEffect(()=> {
+  useEffect(() => {
     setIsLoggedIn(!!getAccessToken());
-  },[])
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -75,15 +75,12 @@ export default function RecipePage() {
         setAllRecipesTotal(0);
       } finally {
         setLoading((p) => ({ ...p, allRecipes: false }));
+        // Let the new data paint first, THEN fade back in
+        setTimeout(() => setIsPageTransitioning(false), 80);
       }
     }
     fetchAllRecipes();
-    if (!loading.allRecipes) {
-      // Let the new data paint first, THEN fade back in
-      const t = setTimeout(() => setIsPageTransitioning(false), 80);
-      return () => clearTimeout(t);
-    }
-  }, [allRecipesPage, searchTerm, loading.allRecipes]);
+  }, [allRecipesPage, searchTerm]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +141,7 @@ export default function RecipePage() {
   );
 
   return (
-    <div className="w-full max-w-[1600] mx-auto px-4 sm:px-6 pt-24 pb-16 flex flex-col gap-12 h-screen max-h-screen overflow-hidden">
+    <div className="w-full max-w-[1600] mx-auto px-4 sm:px-6 pt-24 pb-16 flex flex-col gap-12">
       {/* Search Header - Stationary */}
       <div className="shrink-0">
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">
@@ -170,10 +167,10 @@ export default function RecipePage() {
         </form>
       </div>
 
-      <div className="flex-1 flex flex-col min-h-0 gap-8 overflow-hidden">
+      <div className="flex flex-col gap-8">
         {/* My Creations Section - Contained Scroll */}
         {isLoggedIn && (
-          <section className="flex flex-col min-h-0 max-h-[40%]">
+          <section className="flex flex-col">
             <div className="flex items-center gap-3 mb-4 shrink-0 px-1">
               <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                 <User className="w-5 h-5" />
@@ -182,12 +179,12 @@ export default function RecipePage() {
                 My Creations
               </h2>
             </div>
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20 p-4">
+            <div className="pr-2 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20 p-4">
               {loading.userRecipes ? (
                 <SectionSkeleton count={10} />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-1">
-                  {userRecipes.map((recipe) => (
+                  {userRecipes.slice(0, 10).map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe} />
                   ))}
                   {userRecipes.length === 0 && (
@@ -204,7 +201,7 @@ export default function RecipePage() {
         )}
 
         {/* All Recipes Section - Contained Scroll */}
-        <section className="flex flex-col min-h-0 flex-1">
+        <section className="flex flex-col">
           <div className="flex items-center justify-between mb-4 shrink-0 px-1">
             <div className="flex items-center gap-3">
               <div className="p-1.5 rounded-lg bg-secondary/10 text-secondary">
@@ -219,8 +216,8 @@ export default function RecipePage() {
             </p>
           </div>
 
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20">
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar relative">
+          <div className="flex flex-col rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20">
+            <div className="p-4 relative">
               {/* Skeleton overlay during load */}
               <div
                 className={`absolute inset-0 z-10 bg-white/40 dark:bg-black/40 backdrop-blur-[1px] transition-opacity duration-300 pointer-events-none rounded-2xl ${

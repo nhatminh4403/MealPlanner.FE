@@ -1,11 +1,187 @@
-import React from 'react'
+"use client";
+import { RefreshCw, Plus, CalendarDays } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { getAccessToken } from "@/libs/axios";
+import { MealPlan, MealPlanEntry } from "@/libs/interfaceDTO";
+import { mealPlans, userProfiles } from "@/libs/api";
+import { useHub } from "@/libs/useHub";
+import { toast } from "sonner";
 
-export default function page() {
-  // TODO: Fetch meal plans from API
+import { MealPlanDayCard } from "../../../components/meal-plans/MealPlanDayCard";
+import { MealPlanInsights } from "../../../components/meal-plans/MealPlanInsights";
+import { MealPlanSkeleton } from "../../../components/meal-plans/MealPlanSkeleton";
+
+export default function MealPlansPage() {
+  const [userMealPlans, setUserMealPlans] = useState<MealPlan | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const DAYS = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const fetchMealPlans = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = await getAccessToken();
+      if (token) {
+        const profileResponse = await userProfiles.getMe();
+        const currentUserId = profileResponse.data.id;
+
+        const mealPlanResponse = await mealPlans.getListByUserId({
+          userId: currentUserId,
+          maxResultCount: 1,
+          skipCount: 0,
+        });
+
+        if (
+          mealPlanResponse.data.items &&
+          mealPlanResponse.data.items.length > 0
+        ) {
+          setUserMealPlans(mealPlanResponse.data.items[0]);
+          console.log("Meal plan fetched:", mealPlanResponse.data.items[0]);
+        } else {
+          setUserMealPlans(null);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching meal plans:", err);
+      setError("Failed to fetch meal plans");
+      toast.error("Could not load your meal plans.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMealPlans();
+  }, []);
+  const handleDeleteEntry = async (entryId: string) => {
+    if (!userMealPlans) return;
+    try {
+      await mealPlans.removeEntry(entryId, userMealPlans.id); 
+          setUserMealPlans((prev) => {
+      if (!prev?.days) return prev;
+      return {
+        ...prev,
+        days: prev.days.map((day) => ({
+          ...day,
+          meals: day.meals.filter((m) => m.id !== entryId),
+        })),
+      };
+    });
+    toast.success("Meal removed.");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error("Delete failed:", err.response?.data ?? err.message);
+        toast.error(
+          `Failed to remove meal: ${
+            err.response?.data?.error?.message ?? err.message
+          }`
+        );
+      } else {
+        console.error("Delete failed:", err);
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
+  useHub({
+    onMealPlanUpdated: (updatedPlan: MealPlan) => {
+      setUserMealPlans(updatedPlan);
+      toast.info("Meal plan updated professionally!");
+    },
+  });
+
+  const organizeByDay = () => {
+    if (!userMealPlans?.days) return {};
+    return Object.fromEntries(
+      userMealPlans.days.map((day) => [day.dayOfWeek, day.meals]),
+    );
+  };
+
+  const organizedEntries = organizeByDay();
+
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Meal Plans</h1>
-      <p className="mt-2 text-zinc-500">Plan your meals for the week.</p>
+    <div className="w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
+        <div>
+          <h1 className="text-5xl font-black text-zinc-900 dark:text-white tracking-tight">
+            Weekly Meal Planner
+          </h1>
+          <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
+            Manage your culinary journey and nutritional goals with precision.
+          </p>
+        </div>
+        <button className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 active:scale-[0.98]">
+          <Plus size={24} />
+          <span>Create New Plan</span>
+        </button>
+      </div>
+
+      <div className="relative">
+        <div className="absolute top-0 right-0 -mr-40 -mt-40 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-3xl font-extrabold text-zinc-900 dark:text-white flex items-center gap-3">
+              <CalendarDays className="text-emerald-500" size={32} />
+              <span>Current Schedule</span>
+            </h2>
+            <button
+              onClick={fetchMealPlans}
+              disabled={loading}
+              className="p-4 text-zinc-500 hover:text-emerald-500 transition-all rounded-2xl bg-zinc-100/50 dark:bg-zinc-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 disabled:opacity-50 border border-zinc-200/50 dark:border-zinc-700/50"
+            >
+              <RefreshCw
+                size={22}
+                className={loading && userMealPlans ? "animate-spin" : ""}
+              />
+            </button>
+          </div>
+
+          <div className="space-y-12">
+            {loading ? (
+              <MealPlanSkeleton />
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-24 bg-zinc-50/50 dark:bg-zinc-800/20 rounded-[2.5rem] border border-red-100 dark:border-red-900/10">
+                <p className="text-red-500 font-bold mb-8 text-xl">{error}</p>
+                <button
+                  onClick={fetchMealPlans}
+                  className="px-10 py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg"
+                >
+                  Retry Connection
+                </button>
+              </div>
+            ) : (
+              <div className="bg-transparent border-none">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4 xl:gap-6">
+                  {DAYS.map((dayName, dayIndex) => (
+                    <MealPlanDayCard
+                      key={dayName}
+                      dayName={dayName}
+                      dayEntries={organizedEntries[dayIndex] ?? []}
+                      onDeleteEntry={handleDeleteEntry}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-12">
+            <MealPlanInsights userMealPlans={userMealPlans} />
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }

@@ -8,6 +8,8 @@ import { NotificationDropdown } from "./NotificationDropdown";
 import { logout, isAuthenticated } from "@/libs/axios";
 import { userProfiles } from "@/libs/api";
 import { UserProfile } from "@/libs/interfaceDTO";
+import { useTheme } from "@/libs/ThemeProvider";
+import { Sun, Moon } from "lucide-react";
 
 
 const NAV_LINKS = [
@@ -20,6 +22,7 @@ const NAV_LINKS = [
 export default function Header() {
   const pathname = usePathname();
 
+  const { theme, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [, startTransition] = useTransition();
@@ -120,6 +123,19 @@ export default function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </button>
 
             {/* Notifications */}
             {isLoggedIn && <NotificationDropdown />}

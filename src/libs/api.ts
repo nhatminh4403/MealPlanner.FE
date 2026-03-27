@@ -1,5 +1,13 @@
 import { api } from "./axios";
-import { PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe, CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, ShoppingList, ShoppingListItem, AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto, ChangePasswordDto, DashboardStats, IngredientNutritionDto, IngredientNutritionSearchResultDto, CreateIngredientNutritionDto, UserSettings, CreateUpdateUserSettingsDto } from "./interfaceDTO";
+
+import {
+  PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe,
+  CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, AutoGenerateMealPlanDto, ShoppingList, ShoppingListItem,
+  AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto,
+  ChangePasswordDto, DashboardStats, IngredientNutritionDto, IngredientNutritionSearchResultDto,
+  CreateIngredientNutritionDto, UserSettings, CreateUpdateUserSettingsDto,
+  GetMealPlansInput
+} from "./interfaceDTO";
 
 
 
@@ -26,13 +34,20 @@ export const recipes = {
 // ── Meal Plans ────────────────────────────────────────────────────────────────
 
 export const mealPlans = {
-  getMine: () => api.get<MealPlan>("/app/meal-plans/my"),
+
+  getMine: () => api.get<MealPlan>("/app/meal-plans"),
+
+  getListByUserId: (params?: GetMealPlansInput) =>
+    api.get<PagedResult<MealPlan>>("/app/meal-plans", { params }),
 
   addEntry: (data: AddMealPlanEntryDto) =>
     api.post<MealPlan>("/app/meal-plans/entries", data),
 
-  removeEntry: (entryId: string) =>
-    api.delete<MealPlan>(`/app/meal-plans/entries/${entryId}`),
+  removeEntry: (entryId: string, mealPlanId: string) =>
+    api.delete<MealPlan>(`/app/meal-plans/${mealPlanId}/entries/${entryId}`),
+
+  autoGenerate: (data?: AutoGenerateMealPlanDto) =>
+    api.post<MealPlan>("/app/meal-plans/auto-generate", data ?? {}),
 };
 
 // ── Shopping Lists ────────────────────────────────────────────────────────────
@@ -64,10 +79,10 @@ export const shoppingLists = {
 export const notifications = {
   getList: (params?: PagedRequest) =>
     api.get<PagedResult<UserNotification>>("/app/notification", { params }),
-  
+
   // getUnreadNotificationCount: () =>
   //   api.get<number>("/app/notification/unread-count"),
-  
+
   markRead: (id: string) =>
     api.patch(`/app/notification/${id}/read`),
 
@@ -139,4 +154,11 @@ export const userSettings = {
   get: () => api.get<UserSettings>("/app/user/settings"),
   update: (data: CreateUpdateUserSettingsDto) => api.put<UserSettings>("/app/user/settings", data),
 };
+
+// ── Docker Services ───────────────────────────────────────────────────────────
+
+// Example of how to add specific docker API endpoints:
+// export const dockerServices = {
+//   getDockerData: () => dockerApi.get("/some/docker-only-endpoint"),
+// };
 

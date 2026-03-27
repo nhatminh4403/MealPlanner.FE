@@ -1,44 +1,54 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://localhost:44338";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
+const DOCKER_API_URL = process.env.NEXT_PUBLIC_DOCKER_API_URL || "https://localhost:44339";
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach token on every request
-api.interceptors.request.use((config) => { 
-  if (typeof window === "undefined") return config; 
+export const dockerApi = axios.create({
+  baseURL: `${DOCKER_API_URL}/api`,
+  headers: { "Content-Type": "application/json" },
+});
+
+// ── Interceptor Helpers ──────────────────────────────────────────────────────
+
+const requestInterceptor = (config: InternalAxiosRequestConfig) => {
+  if (typeof window === "undefined") return config;
   const token = getAccessToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-});
+};
 
-// Auto-refresh on 401
-api.interceptors.response.use(
-  (res) => res,
-  async (error: AxiosError) => {
-    const original = error.config as typeof error.config & { _retry?: boolean };
+const responseInterceptorError = async (error: AxiosError) => {
+  const original = error.config as typeof error.config & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !original?._retry) {
-      original._retry = true;
-      try {
-        const token = await refreshAccessToken();
-        if (token && original) {
-          original.headers = original.headers ?? {};
-          original.headers.Authorization = `Bearer ${token}`;
-          return api(original);
-        }
-      } catch {
-        clearTokens();
-        window.location.href = "/login";
+  if (error.response?.status === 401 && !original?._retry) {
+    original._retry = true;
+    try {
+      const token = await refreshAccessToken();
+      if (token && original) {
+        original.headers = original.headers ?? {};
+        original.headers.Authorization = `Bearer ${token}`;
+        return axios(original);
       }
+    } catch {
+      clearTokens();
+      window.location.href = "/login";
     }
-
-    return Promise.reject(error);
   }
-);
+
+  return Promise.reject(error);
+};
+
+// Apply interceptors
+api.interceptors.request.use(requestInterceptor);
+api.interceptors.response.use((res) => res, responseInterceptorError);
+
+dockerApi.interceptors.request.use(requestInterceptor);
+dockerApi.interceptors.response.use((res) => res, responseInterceptorError);
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 

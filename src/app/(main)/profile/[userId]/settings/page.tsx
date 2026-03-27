@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, use } from "react";
-import { useTheme } from "@/libs/ThemeProvider";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -13,7 +12,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { userSettings } from "@/libs/api";
 import { UserSettings, VisibilityLevel } from "@/libs/interfaceDTO";
-import { Moon, Sun, Bell, Shield, Palette, Save } from "lucide-react";
+import { Bell, Shield, Palette, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -23,7 +22,6 @@ interface PageProps {
 
 export default function SettingsPage({ params }: PageProps) {
   const { userId } = use(params);
-  const { theme, toggleTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,21 +90,8 @@ export default function SettingsPage({ params }: PageProps) {
 
         <TabsContent value="appearance" className="space-y-6">
           <div className="rounded-2xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-950/50 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Theme</h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Personalize how MealPlanner looks on your device.</p>
-            
-            <div className="mt-8 flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-100 dark:border-zinc-800">
-              <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm">
-                  {theme === 'dark' ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-yellow-500" />}
-                </div>
-                <div>
-                  <p className="font-semibold text-zinc-900 dark:text-white">Dark Mode</p>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Switch between light and dark themes.</p>
-                </div>
-              </div>
-              <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
-            </div>
+            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Appearance</h2>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Settings related to how MealPlanner looks. Use the theme toggle in the header to switch between light and dark modes.</p>
           </div>
         </TabsContent>
 
