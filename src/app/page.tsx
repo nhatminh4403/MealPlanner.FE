@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { recipes as recipeApi } from "@/libs/api";
 import { dashboard } from "@/libs/api";
-import RecipeCard from "./(main)/recipe/components/RecipeCard";
+import RecipeCard from "../components/recipes/RecipeCard";
 import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 import { Star, TrendingUp } from "lucide-react";
 
@@ -57,9 +57,13 @@ export default function Home() {
       <section className="mb-16 min-h-420px">
         <div className="flex items-center gap-2 mb-6">
           <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Top Rated</h2>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            Top Rated
+          </h2>
         </div>
-        <div className={`transition-opacity duration-500 ${loading.topRated ? "opacity-0" : "opacity-100"}`}>
+        <div
+          className={`transition-opacity duration-500 ${loading.topRated ? "opacity-0" : "opacity-100"}`}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {topRated.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
@@ -77,9 +81,13 @@ export default function Home() {
       <section className="mb-16 min-h-420px">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-5 h-5 text-emerald-500" />
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Trending</h2>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            Trending
+          </h2>
         </div>
-        <div className={`transition-opacity duration-500 ${loading.trending ? "opacity-0" : "opacity-100"}`}>
+        <div
+          className={`transition-opacity duration-500 ${loading.trending ? "opacity-0" : "opacity-100"}`}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {trending.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} variant="trending" />
