@@ -25,10 +25,12 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const [, startTransition] = useTransition();
 
   const [isMounted, setIsMounted] = useState(false);
 
+  // Initial mount state
   useEffect(() => {
     startTransition(() => {
       setIsMounted(true);
@@ -70,15 +72,22 @@ export default function Header() {
     };
   }, []);
 
-  // Close mobile menu on route change
+  // Reset navigation and close mobile menu on route change
   useEffect(() => {
     startTransition(() => {
+      setIsNavigating(false);
       setIsMobileMenuOpen(false);
     });
-  }, [pathname]);
+  }, [pathname, startTransition]);
 
   return (
     <>
+      {/* Top Loading Progress Bar */}
+      {isNavigating && (
+        <div className="fixed top-0 left-0 right-0 z-100 h-0.75 overflow-hidden">
+          <div className="h-full w-full bg-linear-to-r from-primary to-secondary animate-progress-bar shadow-[0_0_12px_rgba(59,130,246,0.8)]" />
+        </div>
+      )}
       <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md transition-colors duration-300 dark:border-zinc-800 dark:bg-black/80">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           {/* Brand / Logo */}
@@ -101,8 +110,11 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={() => {
+                    if (pathname !== link.href) setIsNavigating(true);
+                  }}
                   className={`group relative flex h-full items-center px-4 text-sm
-                     font-semibold transition-all duration-150 ${
+                     font-semibold transition-all duration-300 ${
                        isActive
                          ? "text-zinc-900 bg-active-gradient dark:text-white"
                          : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900/40"
@@ -211,6 +223,7 @@ export default function Header() {
                           onClick={() => {
                             setIsDropdownOpen(false);
                             logout();
+                            window.location.href = "/";
                           }}
                         >
                           Sign out
@@ -306,6 +319,10 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={() => {
+                      if (pathname !== link.href) setIsNavigating(true);
+                      setIsMobileMenuOpen(false);
+                    }}
                     className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
                       isActive
                         ? "bg-active-gradient text-zinc-900 dark:text-white"

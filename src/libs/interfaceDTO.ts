@@ -120,6 +120,7 @@ export interface AddMealPlanEntryDto {
   recipeId: string;
   mealType: number;
   dayOfWeek: number;
+  mealName : string;
 }
 export interface MealPlanDay {
   dayOfWeek: number;

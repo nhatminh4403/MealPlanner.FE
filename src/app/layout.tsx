@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/libs/ThemeProvider";
 import { NotificationProvider } from "@/libs/NotificationProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,10 +57,25 @@ export default function RootLayout({
               <div className="bg-gradient-mesh pointer-events-none fixed inset-0 z-0" />
               <div className="relative z-10 flex flex-1 flex-col">
                 <Header />
-                <main className="flex-1">
-                  {children}
-                </main>
+                <main className="flex-1">{children}</main>
+
                 <Footer />
+                <Toaster
+                  position="bottom-right"
+                  visibleToasts={3}
+                  toastOptions={{
+                    style: {
+                      background:
+                        "linear-gradient(135deg, rgba(37, 99, 235, 0.32), rgba(5, 150, 105, 0.32))",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      color: "white",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "1rem",
+                      boxShadow: "0 20px 25px -5px rgba(0,0,0,0.3)",
+                    },
+                  }}
+                />
               </div>
             </div>
           </NotificationProvider>

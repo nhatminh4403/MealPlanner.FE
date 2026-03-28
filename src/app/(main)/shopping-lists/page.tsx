@@ -3,7 +3,7 @@ import { RefreshCw, Plus, ShoppingCart } from 'lucide-react';
 
 export default function ShoppingListsPage() {
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12">
+    <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12 animate-page-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Shopping Lists</h1>

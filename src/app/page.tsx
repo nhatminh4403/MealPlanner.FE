@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { recipes as recipeApi } from "@/libs/api";
 import { dashboard } from "@/libs/api";
-import RecipeCard from "../components/recipes/RecipeCard";
+import RecipeSection from "../components/recipes/RecipeSection";
 import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 import { Star, TrendingUp } from "lucide-react";
 
@@ -41,7 +41,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full max-w-1600px mx-auto px-4 sm:px-6 pt-24 pb-16 min-h-screen">
+    <div className="w-full max-w-1600px mx-auto px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in">
       {/* Hero Welcome */}
       <div className="mb-12 rounded-2xl border border-zinc-200 bg-linear-to-b from-white to-zinc-50/50 p-8 shadow-sm dark:border-zinc-800 dark:from-zinc-900/50 dark:to-zinc-950/50">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
@@ -53,53 +53,22 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Top Rated */}
-      <section className="mb-16 min-h-420px">
-        <div className="flex items-center gap-2 mb-6">
-          <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Top Rated
-          </h2>
-        </div>
-        <div
-          className={`transition-opacity duration-500 ${loading.topRated ? "opacity-0" : "opacity-100"}`}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {topRated.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-            {!loading.topRated && topRated.length === 0 && (
-              <p className="col-span-full text-zinc-500 dark:text-zinc-400 py-12 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-2xl">
-                No top-rated recipes yet.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      <RecipeSection
+        title="Top Rated"
+        icon={<Star className="w-5 h-5 fill-amber-400 text-amber-400" />}
+        recipes={topRated}
+        loading={loading.topRated}
+        emptyMessage="No top-rated recipes yet."
+      />
 
-      {/* Trending */}
-      <section className="mb-16 min-h-420px">
-        <div className="flex items-center gap-2 mb-6">
-          <TrendingUp className="w-5 h-5 text-emerald-500" />
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            Trending
-          </h2>
-        </div>
-        <div
-          className={`transition-opacity duration-500 ${loading.trending ? "opacity-0" : "opacity-100"}`}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {trending.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} variant="trending" />
-            ))}
-            {!loading.trending && trending.length === 0 && (
-              <p className="col-span-full text-zinc-500 dark:text-zinc-400 py-12 text-center border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-2xl">
-                No trending recipes right now.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
+      <RecipeSection
+        title="Trending"
+        icon={<TrendingUp className="w-5 h-5 text-emerald-500" />}
+        recipes={trending}
+        loading={loading.trending}
+        emptyMessage="No trending recipes right now."
+        variant="trending"
+      />
     </div>
   );
 }

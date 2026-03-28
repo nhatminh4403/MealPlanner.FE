@@ -83,7 +83,7 @@ export default function RecipeDetailPage() {
   const totalTime = (recipe.prepTimeMinutes ?? 0) + (recipe.cookingTimeMinutes ?? 0);
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-8">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-8 animate-page-in">
       <Button
         variant="ghost"
         size="sm"

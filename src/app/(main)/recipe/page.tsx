@@ -124,7 +124,7 @@ export default function RecipePage() {
   };
 
   const SectionSkeleton = ({ count = 4 }: { count?: number }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse p-1">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-8 gap-6 animate-pulse p-1">
       {[...Array(count)].map((_, i) => (
         <div
           key={i}
@@ -141,7 +141,7 @@ export default function RecipePage() {
   );
 
   return (
-    <div className="w-full max-w-[1600] mx-auto px-4 sm:px-6 pt-24 pb-16 flex flex-col gap-12">
+    <div className="w-full max-w-480 mx-auto px-6 lg:px-12 2xl:px-20 pt-24 pb-16 flex flex-col gap-12 animate-page-in">
       {/* Search Header - Stationary */}
       <div className="shrink-0">
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">
@@ -183,7 +183,7 @@ export default function RecipePage() {
               {loading.userRecipes ? (
                 <SectionSkeleton count={10} />
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-8 gap-6 p-1">
                   {userRecipes.slice(0, 10).map((recipe) => (
                     <RecipeCard key={recipe.id} recipe={recipe} />
                   ))}
@@ -232,7 +232,7 @@ export default function RecipePage() {
                 }`}
               >
                 <div
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 p-1"
+                  className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-8 gap-6 p-1"
                   key={allRecipesPage}
                 >
                   {allRecipes.map((recipe) => (

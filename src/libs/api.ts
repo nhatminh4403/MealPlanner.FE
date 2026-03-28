@@ -40,8 +40,8 @@ export const mealPlans = {
   getListByUserId: (params?: GetMealPlansInput) =>
     api.get<PagedResult<MealPlan>>("/app/meal-plans", { params }),
 
-  addEntry: (data: AddMealPlanEntryDto) =>
-    api.post<MealPlan>("/app/meal-plans/entries", data),
+  addEntry: (mealPlanId: string, data: AddMealPlanEntryDto) =>
+    api.put<MealPlan>(`/app/meal-plans/${mealPlanId}/entries`, data),
 
   removeEntry: (entryId: string, mealPlanId: string) =>
     api.delete<MealPlan>(`/app/meal-plans/${mealPlanId}/entries/${entryId}`),

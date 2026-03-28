@@ -7,7 +7,7 @@ import { MealPlan, MealPlanEntry } from "@/libs/interfaceDTO";
 import { mealPlans, userProfiles } from "@/libs/api";
 import { useHub } from "@/libs/useHub";
 import { toast } from "sonner";
-
+import { DayOfWeek } from "@/libs/enums";
 import { MealPlanDayCard } from "../../../components/meal-plans/MealPlanDayCard";
 import { MealPlanInsights } from "../../../components/meal-plans/MealPlanInsights";
 import { MealPlanSkeleton } from "../../../components/meal-plans/MealPlanSkeleton";
@@ -17,15 +17,15 @@ export default function MealPlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const DAYS = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = [
+  { label: "Sunday", value: DayOfWeek.Sunday },
+  { label: "Monday", value: DayOfWeek.Monday },
+  { label: "Tuesday", value: DayOfWeek.Tuesday },
+  { label: "Wednesday", value: DayOfWeek.Wednesday },
+  { label: "Thursday", value: DayOfWeek.Thursday },
+  { label: "Friday", value: DayOfWeek.Friday },
+  { label: "Saturday", value: DayOfWeek.Saturday },
+];
 
   const fetchMealPlans = async () => {
     try {
@@ -110,7 +110,7 @@ export default function MealPlansPage() {
   const organizedEntries = organizeByDay();
 
   return (
-    <div className="w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen">
+    <div className="w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
         <div>
           <h1 className="text-5xl font-black text-zinc-900 dark:text-white tracking-tight">
@@ -164,11 +164,13 @@ export default function MealPlansPage() {
             ) : (
               <div className="bg-transparent border-none">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-4 xl:gap-6">
-                  {DAYS.map((dayName, dayIndex) => (
+                  {days.map((dayName) => (
                     <MealPlanDayCard
-                      key={dayName}
-                      dayName={dayName}
-                      dayEntries={organizedEntries[dayIndex] ?? []}
+                      key={dayName.value}
+                      dayName={dayName.label}
+                      dayIndex={dayName.value}
+                      mealPlanId={userMealPlans?.id ?? ""}
+                      dayEntries={organizedEntries[dayName.value] ?? []}
                       onDeleteEntry={handleDeleteEntry}
                     />
                   ))}
