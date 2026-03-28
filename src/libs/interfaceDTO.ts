@@ -16,12 +16,6 @@ export interface PagedRequest {
 /** DifficultyLevel: 0=Easy, 1=Medium, 2=Hard */
 export type DifficultyLevel = 0 | 1 | 2;
 export type VisibilityLevel = 0 | 1 | 2; // 0=Private, 1=FriendsOnly, 2=Public
-// public class GetMealPlansInput : PagedAndSortedResultRequestDto
-// {
-//     public DateTime? WeekStartDate { get; set; }
-//     public Guid UserId { get; set; }
-// }
-
 
 export interface GetMealPlansInput extends PagedRequest {
   weekStartDate?: string;
@@ -157,6 +151,7 @@ export interface ShoppingListItem {
   quantity?: string;
   isChecked: boolean;
   category: number;
+  unit: string;
 }
 
 export interface AddShoppingItemDto {
