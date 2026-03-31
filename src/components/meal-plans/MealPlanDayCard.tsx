@@ -141,7 +141,7 @@ export function MealPlanDayCard({
             <Link
               key={slot.type}
               href={`/meal-plans/${mealPlanId}/entries/add?day=${dayIndex}&type=${slot.type}`}
-              className="relative w-full text-left min-h-[4rem] p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-700/30 bg-zinc-50/40 dark:bg-zinc-800/20 group transition-all overflow-hidden flex flex-col justify-center"
+              className="relative w-full text-left min-h-16 p-4 rounded-2xl border border-zinc-200/50 dark:border-zinc-700/30 bg-zinc-50/40 dark:bg-zinc-800/20 group transition-all overflow-hidden flex flex-col justify-center"
             >
               {/* bg-active-gradient layer fades in on hover */}
               <span className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-active-gradient" />
