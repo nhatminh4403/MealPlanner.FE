@@ -6,8 +6,10 @@ import { dashboard } from "@/libs/api";
 import RecipeSection from "../components/recipes/RecipeSection";
 import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 import { Star, TrendingUp } from "lucide-react";
+import { useLocalization } from "@/libs/localization";
 
 export default function Home() {
+  const { L } = useLocalization();
   const [topRated, setTopRated] = useState<RecipeSummary[]>([]);
   const [trending, setTrending] = useState<TrendingRecipe[]>([]);
   const [loading, setLoading] = useState({ topRated: true, trending: true });
@@ -45,28 +47,27 @@ export default function Home() {
       {/* Hero Welcome */}
       <div className="mb-12 rounded-2xl border border-zinc-200 bg-linear-to-b from-white to-zinc-50/50 p-8 shadow-sm dark:border-zinc-800 dark:from-zinc-900/50 dark:to-zinc-950/50">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
-          Welcome to MealPlanner
+          {L("MealPlannerAPI", "WelcomeToMealPlanner")}
         </h1>
         <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          Your personalized recipe management system. Discover new tastes, plan
-          your meals, and keep your shopping organized.
+          {L("MealPlannerAPI", "AppIntroduction")}
         </p>
       </div>
 
       <RecipeSection
-        title="Top Rated"
+        title={L("MealPlannerAPI", "TopRated")}
         icon={<Star className="w-5 h-5 fill-amber-400 text-amber-400" />}
         recipes={topRated}
         loading={loading.topRated}
-        emptyMessage="No top-rated recipes yet."
+        emptyMessage={L("MealPlannerAPI", "NoTopRatedRecipes")}
       />
 
       <RecipeSection
-        title="Trending"
+        title={L("MealPlannerAPI", "Trending")}
         icon={<TrendingUp className="w-5 h-5 text-emerald-500" />}
         recipes={trending}
         loading={loading.trending}
-        emptyMessage="No trending recipes right now."
+        emptyMessage={L("MealPlannerAPI", "NoTrendingRecipes")}
         variant="trending"
       />
     </div>

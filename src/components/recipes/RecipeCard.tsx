@@ -13,14 +13,18 @@ const DIFFICULTY_LABELS: Record<number, string> = {
   2: "Hard",
 };
 
-const PLACEHOLDER_IMAGE = "https://placehold.co/400x300/e2e8f0/64748b?text=Recipe";
+const PLACEHOLDER_IMAGE =
+  "https://placehold.co/400x300/e2e8f0/64748b?text=Recipe";
 
 type RecipeCardProps = {
   recipe: RecipeSummary | TrendingRecipe;
   variant?: "default" | "trending" | "compact";
 };
 
-export default function RecipeCard({ recipe, variant = "default" }: RecipeCardProps) {
+export default function RecipeCard({
+  recipe,
+  variant = "default",
+}: RecipeCardProps) {
   const isTrending = "trendingScore" in recipe && "trendingSince" in recipe;
   const summary = "totalTimeMinutes" in recipe ? recipe : null;
 
@@ -78,23 +82,25 @@ export default function RecipeCard({ recipe, variant = "default" }: RecipeCardPr
             </div>
           )}
         </CardHeader>
-        {variant !== "compact" && "description" in recipe && recipe.description && (
-          <CardContent className="pt-0">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
-              {recipe.description}
-            </p>
-            {summary && (
-              <div className="flex items-center gap-2 mt-3 text-xs text-zinc-400 dark:text-zinc-500">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  {summary.totalTimeMinutes} min
-                </span>
-                <span>•</span>
-                <span>{summary.servings} servings</span>
-              </div>
-            )}
-          </CardContent>
-        )}
+        {variant !== "compact" &&
+          "description" in recipe &&
+          recipe.description && (
+            <CardContent className="pt-0">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                {recipe.description}
+              </p>
+              {summary && (
+                <div className="flex items-center gap-2 mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {summary.totalTimeMinutes} min
+                  </span>
+                  <span>•</span>
+                  <span>{summary.servings} servings</span>
+                </div>
+              )}
+            </CardContent>
+          )}
       </Card>
     </Link>
   );

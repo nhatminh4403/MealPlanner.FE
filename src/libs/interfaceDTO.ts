@@ -1,4 +1,8 @@
-// ── Types (mirror your DTOs) ──────────────────────────────────────────────────
+// ── Imports ───────────────────────────────────────────────────────────────────
+
+import { AvailableLanguage } from "./enums";
+
+// ── Base / Shared Types ───────────────────────────────────────────────────────
 
 export interface PagedResult<T> {
   items: T[];
@@ -11,16 +15,10 @@ export interface PagedRequest {
   sorting?: string;
 }
 
-// ── Recipes ───────────────────────────────────────────────────────────────────
-
-/** DifficultyLevel: 0=Easy, 1=Medium, 2=Hard */
-export type DifficultyLevel = 0 | 1 | 2;
+export type DifficultyLevel = 0 | 1 | 2; // 0=Easy, 1=Medium, 2=Hard
 export type VisibilityLevel = 0 | 1 | 2; // 0=Private, 1=FriendsOnly, 2=Public
 
-export interface GetMealPlansInput extends PagedRequest {
-  weekStartDate?: string;
-  userId?: string;
-}
+// ── Recipes ───────────────────────────────────────────────────────────────────
 
 export interface RecipeSummary {
   id: string;
@@ -52,20 +50,20 @@ export interface RecipeAuthor {
   avatarUrl?: string;
 }
 
-export interface RecipeIngredient {
-  id: string;
-  name: string;
-  quantityGrams: number;
-  displayQuantity?: string;
-  nutrition?: NutritionalInfo;
-}
-
 export interface NutritionalInfo {
   calories: number;
   proteinGrams: number;
   carbsGrams: number;
   fatGrams: number;
   fiberGrams: number;
+}
+
+export interface RecipeIngredient {
+  id: string;
+  name: string;
+  quantityGrams: number;
+  displayQuantity?: string;
+  nutrition?: NutritionalInfo;
 }
 
 export interface Recipe extends RecipeSummary {
@@ -93,11 +91,11 @@ export interface CreateRecipeDto {
 
 export type UpdateRecipeDto = Partial<CreateRecipeDto>;
 
-export interface MealPlan {
-  id: string;
-  userId: string;
-  weekStartDate: string;
-  entries: MealPlanEntry[];
+// ── Meal Plans ────────────────────────────────────────────────────────────────
+
+export interface GetMealPlansInput extends PagedRequest {
+  weekStartDate?: string;
+  userId?: string;
 }
 
 export interface MealPlanEntry {
@@ -110,40 +108,35 @@ export interface MealPlanEntry {
   dayOfWeek: number;
 }
 
-export interface AddMealPlanEntryDto {
-  recipeId: string;
-  mealType: number;
-  dayOfWeek: number;
-  mealName : string;
-}
 export interface MealPlanDay {
   dayOfWeek: number;
   meals: MealPlanEntry[];
 }
+
 export interface MealPlan {
   id: string;
   userId: string;
   weekStartDate: string;
-  days: MealPlanDay[];   // ← matches backend MealPlanDto.Days
+  days: MealPlanDay[];
 }
-/** Input for auto-generating a meal plan based on user preferences */
+
+export interface AddMealPlanEntryDto {
+  recipeId: string;
+  mealType: number;
+  dayOfWeek: number;
+  mealName: string;
+}
+
 export interface AutoGenerateMealPlanDto {
   weekStartDate?: string;
   cuisinePreferences?: string[];
   dietaryRestrictions?: string[];
   maxTotalTimeMinutes?: number;
-  /** 0 = Easy, 1 = Medium, 2 = Hard */
   maxDifficulty?: number;
-  /** Meal type enums: 0=Breakfast, 1=Lunch, 2=Dinner, 3=Snack */
   mealTypes?: number[];
 }
 
-export interface ShoppingList {
-  id: string;
-  name: string;
-  items: ShoppingListItem[];
-  creationTime: string;
-}
+// ── Shopping List ─────────────────────────────────────────────────────────────
 
 export interface ShoppingListItem {
   id: string;
@@ -154,20 +147,61 @@ export interface ShoppingListItem {
   unit: string;
 }
 
+export interface ShoppingList {
+  id: string;
+  name: string;
+  items: ShoppingListItem[];
+  creationTime: string;
+}
+
 export interface AddShoppingItemDto {
   name: string;
   quantity?: string;
   category?: number;
 }
 
-export interface UserNotification {
+// ── Nutrition ─────────────────────────────────────────────────────────────────
+
+export interface IngredientNutritionDto {
   id: string;
-  title: string;
-  message: string;
-  type: string;
-  isRead: boolean;
-  creationTime: string;
+  name: string;
+  caloriesPer100g: number;
+  proteinPer100g: number;
+  carbsPer100g: number;
+  fatPer100g: number;
+  fiberPer100g: number;
+  isVerified: boolean;
 }
+
+export interface ExternalFoodCandidateDto {
+  name: string;
+  brand?: string;
+  caloriesPer100g: number;
+  proteinPer100g: number;
+  carbsPer100g: number;
+  fatPer100g: number;
+  fiberPer100g: number;
+  completenessScore: number;
+  externalId?: string;
+  source: string;
+}
+
+export interface IngredientNutritionSearchResultDto {
+  dbResults: IngredientNutritionDto[];
+  externalCandidates: ExternalFoodCandidateDto[];
+}
+
+export interface CreateIngredientNutritionDto {
+  name: string;
+  caloriesPer100g: number;
+  proteinPer100g: number;
+  carbsPer100g: number;
+  fatPer100g: number;
+  fiberPer100g: number;
+  sourceExternalId?: string;
+}
+
+// ── User ──────────────────────────────────────────────────────────────────────
 
 export interface UserProfile {
   id: string;
@@ -203,46 +237,19 @@ export interface DashboardStats {
   totalFollowing: number;
   averageRating: number;
 }
-export interface IngredientNutritionDto {
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export interface UserNotification {
   id: string;
-  name: string;
-  caloriesPer100g: number;
-  proteinPer100g: number;
-  carbsPer100g: number;
-  fatPer100g: number;
-  fiberPer100g: number;
-  isVerified: boolean;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  creationTime: string;
 }
 
-export interface ExternalFoodCandidateDto {
-  name: string;
-  brand?: string;
-  caloriesPer100g: number;
-  proteinPer100g: number;
-  carbsPer100g: number;
-  fatPer100g: number;
-  fiberPer100g: number;
-  completenessScore: number;
-  externalId?: string;
-  source: string; // "USDA"
-}
-
-export interface IngredientNutritionSearchResultDto {
-  dbResults: IngredientNutritionDto[];
-  externalCandidates: ExternalFoodCandidateDto[];
-}
-
-export interface CreateIngredientNutritionDto {
-  name: string;
-  caloriesPer100g: number;
-  proteinPer100g: number;
-  carbsPer100g: number;
-  fatPer100g: number;
-  fiberPer100g: number;
-  sourceExternalId?: string; // USDA fdcId
-}
-
-// ── User Settings ─────────────────────────────────────────────────────────────
+// ── Settings ──────────────────────────────────────────────────────────────────
 
 export interface UserPrivacy {
   profileVisibility: VisibilityLevel;
@@ -265,4 +272,46 @@ export interface UserSettings {
 export interface CreateUpdateUserSettingsDto {
   privacy: UserPrivacy;
   notifications: UserNotificationPreferences;
+}
+
+// ── Localization & Configuration ──────────────────────────────────────────────
+
+export interface ApplicationLocalization {
+  cultureName: AvailableLanguage;
+  onlyDynamics?: boolean;
+}
+
+export interface ApplicationLocalizationResponse {
+  resources: Record<string, { texts: Record<string, string> }>;
+}
+
+export interface ApplicationConfigurationResponse {
+  currentUser: {
+    id: string | null;
+    userName: string | null;
+    isAuthenticated: boolean;
+  };
+  auth: {
+    grantedPolicies: Record<string, boolean>;
+  };
+  localization: {
+    currentCulture: { name: string; displayName: string };
+    languages: { cultureName: string; displayName: string }[];
+    values?: Record<string, Record<string, string>>;
+  };
+}
+export type UnitCategory = "weight" | "volume" | "count";
+export interface CreateRecipeIngredientDto {
+  name: string;
+  quantity: number;
+  unit: string;
+  nutritionId?: string;
+}
+
+export interface Unit {
+  label: string; // display label e.g. "tbsp"
+  fullName: string; // e.g. "Tablespoon"
+  category: UnitCategory;
+  /** Grams per unit for weight; ml per unit for volume; null for count */
+  factor: number | null;
 }

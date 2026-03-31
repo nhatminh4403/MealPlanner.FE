@@ -1,158 +1,203 @@
-import { api } from "./axios";
+import { getApiInstance } from "./axios";
+import { AvailableLanguage } from "./enums";
+
+const http = () => getApiInstance();
 
 import {
-  PagedRequest, PagedResult, Recipe, RecipeSummary, TrendingRecipe,
-  CreateRecipeDto, UpdateRecipeDto, MealPlan, AddMealPlanEntryDto, AutoGenerateMealPlanDto, ShoppingList, ShoppingListItem,
-  AddShoppingItemDto, UserNotification, UserProfile, UpdateProfileInfoDto, UpdatePreferencesDto,
-  ChangePasswordDto, DashboardStats, IngredientNutritionDto, IngredientNutritionSearchResultDto,
-  CreateIngredientNutritionDto, UserSettings, CreateUpdateUserSettingsDto,
-  GetMealPlansInput
+  PagedRequest,
+  PagedResult,
+  Recipe,
+  RecipeSummary,
+  TrendingRecipe,
+  CreateRecipeDto,
+  UpdateRecipeDto,
+  MealPlan,
+  AddMealPlanEntryDto,
+  AutoGenerateMealPlanDto,
+  ShoppingList,
+  ShoppingListItem,
+  AddShoppingItemDto,
+  UserNotification,
+  UserProfile,
+  UpdateProfileInfoDto,
+  UpdatePreferencesDto,
+  ChangePasswordDto,
+  DashboardStats,
+  IngredientNutritionDto,
+  IngredientNutritionSearchResultDto,
+  CreateIngredientNutritionDto,
+  UserSettings,
+  CreateUpdateUserSettingsDto,
+  GetMealPlansInput,
+  ApplicationLocalizationResponse,
+  ApplicationConfigurationResponse,
 } from "./interfaceDTO";
 
+export const abpDefaultApis = {
+  localization: (cultureName: AvailableLanguage) =>
+    http().get<ApplicationLocalizationResponse>(
+      "/abp/application-localization",
+      { params: { cultureName } },
+    ),
 
+  configuration: (includeLocalizationResources = false) =>
+    http().get<ApplicationConfigurationResponse>(
+      "/abp/application-configuration",
+      {
+        params: { IncludeLocalizationResources: includeLocalizationResources },
+      },
+    ),
+};
 
 export const recipes = {
-  getList: (params?: PagedRequest & { searchTerm?: string; cuisine?: string; difficulty?: number; maxTotalTimeMinutes?: number; vegetarian?: boolean; sorting?: string }) =>
-    api.get<PagedResult<RecipeSummary>>("/app/recipe", { params }),
+  getList: (
+    params?: PagedRequest & {
+      searchTerm?: string;
+      cuisine?: string;
+      difficulty?: number;
+      maxTotalTimeMinutes?: number;
+      vegetarian?: boolean;
+      sorting?: string;
+    },
+  ) => http().get<PagedResult<RecipeSummary>>("/app/recipe", { params }),
 
-  get: (id: string) => api.get<Recipe>(`/app/recipe/${id}`),
+  get: (id: string) => http().get<Recipe>(`/app/recipe/${id}`),
 
   getTopRated: (count = 10) =>
-    api.get<{ items: RecipeSummary[] }>(`/app/recipe/top-rated`, { params: { count } }),
+    http().get<{ items: RecipeSummary[] }>(`/app/recipe/top-rated`, {
+      params: { count },
+    }),
 
   getByAuthor: (authorId: string) =>
-    api.get<{ items: RecipeSummary[] }>(`/app/recipe/by-author/${authorId}`),
+    http().get<{ items: RecipeSummary[] }>(`/app/recipe/by-author/${authorId}`),
 
-  create: (data: CreateRecipeDto) => api.post<Recipe>("/app/recipe", data),
+  create: (data: CreateRecipeDto) => http().post<Recipe>("/app/recipe", data),
 
   update: (id: string, data: UpdateRecipeDto) =>
-    api.put<Recipe>(`/app/recipe/${id}`, data),
+    http().put<Recipe>(`/app/recipe/${id}`, data),
 
-  delete: (id: string) => api.delete(`/app/recipe/${id}`),
+  delete: (id: string) => http().delete(`/app/recipe/${id}`),
 };
 
 // ── Meal Plans ────────────────────────────────────────────────────────────────
 
 export const mealPlans = {
-
-  getMine: () => api.get<MealPlan>("/app/meal-plans"),
+  getMine: () => http().get<MealPlan>("/app/meal-plans"),
 
   getListByUserId: (params?: GetMealPlansInput) =>
-    api.get<PagedResult<MealPlan>>("/app/meal-plans", { params }),
+    http().get<PagedResult<MealPlan>>("/app/meal-plans", { params }),
 
   addEntry: (mealPlanId: string, data: AddMealPlanEntryDto) =>
-    api.put<MealPlan>(`/app/meal-plans/${mealPlanId}/entries`, data),
+    http().put<MealPlan>(`/app/meal-plans/${mealPlanId}/entries`, data),
 
   removeEntry: (entryId: string, mealPlanId: string) =>
-    api.delete<MealPlan>(`/app/meal-plans/${mealPlanId}/entries/${entryId}`),
+    http().delete<MealPlan>(`/app/meal-plans/${mealPlanId}/entries/${entryId}`),
 
   autoGenerate: (data?: AutoGenerateMealPlanDto) =>
-    api.post<MealPlan>("/app/meal-plans/auto-generate", data ?? {}),
+    http().post<MealPlan>("/app/meal-plans/auto-generate", data ?? {}),
 };
 
 // ── Shopping Lists ────────────────────────────────────────────────────────────
 
 export const shoppingLists = {
-  getList: () => api.get<PagedResult<ShoppingList>>("/app/shopping-lists"),
+  getList: () => http().get<PagedResult<ShoppingList>>("/app/shopping-lists"),
 
-  get: (id: string) => api.get<ShoppingList>(`/app/shopping-lists/${id}`),
+  get: (id: string) => http().get<ShoppingList>(`/app/shopping-lists/${id}`),
 
   create: (data: { name: string }) =>
-    api.post<ShoppingList>("/app/shopping-lists", data),
+    http().post<ShoppingList>("/app/shopping-lists", data),
 
-  delete: (id: string) => api.delete(`/app/shopping-lists/${id}`),
+  delete: (id: string) => http().delete(`/app/shopping-lists/${id}`),
 
   addItem: (listId: string, data: AddShoppingItemDto) =>
-    api.post<ShoppingList>(`/app/shopping-lists/${listId}/items`, data),
+    http().post<ShoppingList>(`/app/shopping-lists/${listId}/items`, data),
 
   toggleItem: (listId: string, itemId: string) =>
-    api.patch<ShoppingListItem>(
-      `/app/shopping-lists/${listId}/items/${itemId}/toggle`
+    http().patch<ShoppingListItem>(
+      `/app/shopping-lists/${listId}/items/${itemId}/toggle`,
     ),
 
   removeItem: (listId: string, itemId: string) =>
-    api.delete(`/app/shopping-lists/${listId}/items/${itemId}`),
+    http().delete(`/app/shopping-lists/${listId}/items/${itemId}`),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
 
 export const notifications = {
   getList: (params?: PagedRequest) =>
-    api.get<PagedResult<UserNotification>>("/app/notification", { params }),
+    http().get<PagedResult<UserNotification>>("/app/notification", { params }),
 
   // getUnreadNotificationCount: () =>
   //   api.get<number>("/app/notification/unread-count"),
 
-  markRead: (id: string) =>
-    api.patch(`/app/notification/${id}/read`),
+  markRead: (id: string) => http().patch(`/app/notification/${id}/read`),
 
-  markUnread: (id: string) =>
-    api.patch(`/app/notification/${id}/unread`),
+  markUnread: (id: string) => http().patch(`/app/notification/${id}/unread`),
 
-  markAllRead: () => api.patch("/app/notification/read-all"),
+  markAllRead: () => http().patch("/app/notification/read-all"),
 
-  delete: (id: string) => api.delete(`/app/notification/${id}`),
+  delete: (id: string) => http().delete(`/app/notification/${id}`),
 };
 
 // ── User Profiles ─────────────────────────────────────────────────────────────
 
 export const userProfiles = {
-  getMe: () => api.get<UserProfile>("/app/user/me"),
+  getMe: (config?: { signal?: AbortSignal }) =>
+    http().get<UserProfile>("/app/user/me", config),
 
-  getUser: (userId: string) => api.get<UserProfile>(`/app/user/${userId}`),
+  getUser: (userId: string) => http().get<UserProfile>(`/app/user/${userId}`),
 
   updateProfile: (data: UpdateProfileInfoDto) =>
-    api.patch<UserProfile>("/app/user/me", data),
+    http().patch<UserProfile>("/app/user/me", data),
 
   updateAvatar: (avatarUrl: string) =>
-    api.patch<UserProfile>("/app/user/me/avatar", { avatarUrl }),
+    http().patch<UserProfile>("/app/user/me/avatar", { avatarUrl }),
 
   updatePreferences: (data: UpdatePreferencesDto) =>
-    api.patch<UserProfile>("/app/user/me/preferences", data),
+    http().patch<UserProfile>("/app/user/me/preferences", data),
 
   changePassword: (data: ChangePasswordDto) =>
-    api.patch("/app/user/me/password", data),
+    http().patch("/app/user/me/password", data),
 
-  follow: (userId: string) =>
-    api.post(`/app/user/${userId}/follow`),
+  follow: (userId: string) => http().post(`/app/user/${userId}/follow`),
 
-  unfollow: (userId: string) =>
-    api.delete(`/app/user/${userId}/follow`),
+  unfollow: (userId: string) => http().delete(`/app/user/${userId}/follow`),
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export const dashboard = {
-  getStats: () => api.get<DashboardStats>("/app/dashboard/stats"),
+  getStats: () => http().get<DashboardStats>("/app/dashboard/stats"),
 
   getTrending: () =>
-    api.get<{ items: TrendingRecipe[] }>("/app/dashboard/trending"),
+    http().get<{ items: TrendingRecipe[] }>("/app/dashboard/trending"),
 };
 
 // ── Endpoint functions ────────────────────────────────────────────────────────
 
 export const ingredientNutritions = {
   search: (query: string, includeExternal = false) =>
-    api.get<IngredientNutritionSearchResultDto>(
+    http().get<IngredientNutritionSearchResultDto>(
       "/app/ingredient-nutritions/search",
-      { params: { query, includeExternal } }
+      { params: { query, includeExternal } },
     ),
 
   create: (data: CreateIngredientNutritionDto) =>
-    api.post<IngredientNutritionDto>("/app/ingredient-nutritions", data),
+    http().post<IngredientNutritionDto>("/app/ingredient-nutritions", data),
 
   getList: (params?: { skipCount?: number; maxResultCount?: number }) =>
-    api.get<{ items: IngredientNutritionDto[]; totalCount: number }>(
+    http().get<{ items: IngredientNutritionDto[]; totalCount: number }>(
       "/app/ingredient-nutritions",
-      { params }
+      { params },
     ),
 };
 
 // ── User Settings ─────────────────────────────────────────────────────────────
 
 export const userSettings = {
-  get: () => api.get<UserSettings>("/app/user/settings"),
-  update: (data: CreateUpdateUserSettingsDto) => api.put<UserSettings>("/app/user/settings", data),
+  get: () => http().get<UserSettings>("/app/user/settings"),
+  update: (data: CreateUpdateUserSettingsDto) =>
+    http().put<UserSettings>("/app/user/settings", data),
 };
 
 // ── Docker Services ───────────────────────────────────────────────────────────
@@ -161,4 +206,3 @@ export const userSettings = {
 // export const dockerServices = {
 //   getDockerData: () => dockerApi.get("/some/docker-only-endpoint"),
 // };
-

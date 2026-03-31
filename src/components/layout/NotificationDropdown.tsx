@@ -10,7 +10,7 @@ import {
 import { notifications as notificationsApi } from "@/libs/api";
 import { UserNotification } from "@/libs/interfaceDTO";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "@/libs/NotificationProvider";
 import {
@@ -170,13 +170,13 @@ export function NotificationDropdown() {
                     onClick={() => handleMarkAsRead(item)}
                     className={cn(
                       "group flex items-start gap-3 px-4 py-3.5 cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800",
-                      !item.isRead && "bg-primary/5 dark:bg-primary/10"
+                      !item.isRead && "bg-primary/5 dark:bg-primary/10",
                     )}
                   >
                     <div
                       className={cn(
                         "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                        cfg.bg
+                        cfg.bg,
                       )}
                     >
                       <Icon className={cn("h-4 w-4", cfg.color)} />
@@ -196,7 +196,7 @@ export function NotificationDropdown() {
                           "text-sm leading-snug",
                           !item.isRead
                             ? "font-medium text-zinc-900 dark:text-zinc-100"
-                            : "text-zinc-500 dark:text-zinc-400"
+                            : "text-zinc-500 dark:text-zinc-400",
                         )}
                       >
                         {item.message}

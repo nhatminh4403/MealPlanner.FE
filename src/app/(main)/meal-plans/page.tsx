@@ -157,7 +157,9 @@ export default function MealPlansPage() {
           </button>
           <button
             onClick={() => setIsAutoGenerateModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 active:scale-[0.98]"
+            className="flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600
+             text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl
+              shadow-indigo-500/20 hover:shadow-indigo-500/40 active:scale-[0.98]"
           >
             <Sparkles size={24} />
             <span>{L("MealPlannerAPI", "AutoGeneratePlan")}</span>

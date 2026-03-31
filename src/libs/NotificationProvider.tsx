@@ -27,7 +27,7 @@ interface NotificationContextType {
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
+  undefined,
 );
 
 // SignalR sends UserNotificationDto (number type), REST returns UserNotification (string type).
@@ -87,7 +87,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   // ── Mutation helpers (called by dropdown after REST mutations) ──────────────
   const markItemRead = useCallback((id: string) => {
     setRecentItems((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
     // Count will update via SignalR; decrement optimistically in case of lag
     setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -104,7 +104,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const decrementCount = useCallback(
     () => setUnreadCount((prev) => Math.max(0, prev - 1)),
-    []
+    [],
   );
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -135,6 +135,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 export function useNotifications() {
   const ctx = useContext(NotificationContext);
   if (!ctx)
-    throw new Error("useNotifications must be used within a NotificationProvider");
+    throw new Error(
+      "useNotifications must be used within a NotificationProvider",
+    );
   return ctx;
 }

@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function EntryPage() {
-  return (
-    <div>page</div>
-  )
+  return <div>page</div>;
 }

@@ -30,7 +30,10 @@ const DAYS = [
   { label: "Saturday", value: DayOfWeek.Saturday },
 ];
 
-const MEAL_COLORS: Record<  number,  { accent: string; pill: string; glow: string }> = {
+const MEAL_COLORS: Record<
+  number,
+  { accent: string; pill: string; glow: string }
+> = {
   0: {
     accent: "text-amber-400",
     pill: "bg-amber-500/15 text-amber-400 border-amber-500/20",

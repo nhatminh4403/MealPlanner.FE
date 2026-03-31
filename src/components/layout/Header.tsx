@@ -11,7 +11,6 @@ import { UserProfile } from "@/libs/interfaceDTO";
 import { useTheme } from "@/libs/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
 
-
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/recipe", label: "Recipes" },
@@ -39,20 +38,20 @@ export default function Header() {
 
   const isLoggedIn = isMounted && isAuthenticated();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  
+
   useEffect(() => {
     if (isLoggedIn) {
-      userProfiles.getMe()
-        .then(res => {
+      userProfiles
+        .getMe()
+        .then((res) => {
           if (res.data) setUserProfile(res.data);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Failed to fetch user profile:", err);
           // Don't set state to avoid "Null?" UI if possible, or handle it as a fallback
         });
     }
   }, [isLoggedIn]);
-
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -102,40 +101,40 @@ export default function Header() {
           <nav className="hidden h-full items-center space-x-1 md:flex">
             {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
               (link) => {
-              const isActive =
-                pathname === link.href ||
-                (pathname?.startsWith(link.href) && link.href !== "/");
+                const isActive =
+                  pathname === link.href ||
+                  (pathname?.startsWith(link.href) && link.href !== "/");
 
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => {
-                    if (pathname !== link.href) setIsNavigating(true);
-                  }}
-                  className={`group relative flex h-full items-center px-4 text-sm
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => {
+                      if (pathname !== link.href) setIsNavigating(true);
+                    }}
+                    className={`group relative flex h-full items-center px-4 text-sm
                      font-semibold transition-all duration-300 ${
                        isActive
                          ? "text-zinc-900 bg-active-gradient dark:text-white"
                          : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900/40"
                      }`}
-                >
-                  {!isActive && (
-                    <div className="gradient-border-persistent group-hover:opacity-10" />
-                  )}
-                  <span className="relative z-10">{link.label}</span>
-                  {/* Active Indicator */}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 h-0.5 w-full bg-linear-to-r from-primary to-secondary shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
-                  )}
-                </Link>
-              );
-            })}
+                  >
+                    {!isActive && (
+                      <div className="gradient-border-persistent group-hover:opacity-10" />
+                    )}
+                    <span className="relative z-10">{link.label}</span>
+                    {/* Active Indicator */}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 h-0.5 w-full bg-linear-to-r from-primary to-secondary shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
+                    )}
+                  </Link>
+                );
+              },
+            )}
           </nav>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
-
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -162,9 +161,9 @@ export default function Header() {
               >
                 {isLoggedIn ? (
                   userProfile?.avatarUrl ? (
-                    <Image 
-                      src={userProfile.avatarUrl} 
-                      alt={userProfile.name || "User"} 
+                    <Image
+                      src={userProfile.avatarUrl}
+                      alt={userProfile.name || "User"}
                       width={36}
                       height={36}
                       className="h-full w-full object-cover"
@@ -172,7 +171,9 @@ export default function Header() {
                     />
                   ) : (
                     <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-                      {userProfile?.name?.charAt(0).toUpperCase() || userProfile?.userName?.charAt(0).toUpperCase() || "U"}
+                      {userProfile?.name?.charAt(0).toUpperCase() ||
+                        userProfile?.userName?.charAt(0).toUpperCase() ||
+                        "U"}
                     </span>
                   )
                 ) : (
@@ -201,7 +202,9 @@ export default function Header() {
                     <>
                       <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
                         <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                          {userProfile?.name || userProfile?.userName || "Null?"}
+                          {userProfile?.name ||
+                            userProfile?.userName ||
+                            "Null?"}
                         </p>
                         <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                           {userProfile?.email || ""}
@@ -209,13 +212,16 @@ export default function Header() {
                       </div>
                       <div className="py-1">
                         <Link
-                          href={userProfile ? `/profile/${userProfile.id}/settings` : "/settings"}
+                          href={
+                            userProfile
+                              ? `/profile/${userProfile.id}/settings`
+                              : "/settings"
+                          }
                           className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
                           onClick={() => setIsDropdownOpen(false)}
                         >
                           Settings
                         </Link>
-
                       </div>
                       <div className="border-t border-zinc-100 py-1 dark:border-zinc-800">
                         <button
@@ -312,31 +318,32 @@ export default function Header() {
             <nav className="flex flex-col px-4 py-3">
               {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
                 (link) => {
-                const isActive =
-                  pathname === link.href ||
-                  (pathname?.startsWith(link.href) && link.href !== "/");
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => {
-                      if (pathname !== link.href) setIsNavigating(true);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
-                      isActive
-                        ? "bg-active-gradient text-zinc-900 dark:text-white"
-                        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                    }`}
-                  >
-                    {/* Active left bar */}
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-linear-to-b from-primary to-secondary" />
-                    )}
-                    <span className="pl-2">{link.label}</span>
-                  </Link>
-                );
-              })}
+                  const isActive =
+                    pathname === link.href ||
+                    (pathname?.startsWith(link.href) && link.href !== "/");
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => {
+                        if (pathname !== link.href) setIsNavigating(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
+                        isActive
+                          ? "bg-active-gradient text-zinc-900 dark:text-white"
+                          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                      }`}
+                    >
+                      {/* Active left bar */}
+                      {isActive && (
+                        <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-linear-to-b from-primary to-secondary" />
+                      )}
+                      <span className="pl-2">{link.label}</span>
+                    </Link>
+                  );
+                },
+              )}
             </nav>
 
             {/* Divider */}
@@ -348,9 +355,9 @@ export default function Header() {
                 <div className="flex items-center gap-3">
                   <div className="gradient-border flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                     {userProfile?.avatarUrl ? (
-                      <Image 
-                        src={userProfile.avatarUrl} 
-                        alt={userProfile.name || "User"} 
+                      <Image
+                        src={userProfile.avatarUrl}
+                        alt={userProfile.name || "User"}
                         width={36}
                         height={36}
                         className="h-full w-full object-cover"
@@ -358,7 +365,9 @@ export default function Header() {
                       />
                     ) : (
                       <span className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-                        {userProfile?.name?.charAt(0).toUpperCase() || userProfile?.userName?.charAt(0).toUpperCase() || "U"}
+                        {userProfile?.name?.charAt(0).toUpperCase() ||
+                          userProfile?.userName?.charAt(0).toUpperCase() ||
+                          "U"}
                       </span>
                     )}
                   </div>
@@ -372,13 +381,16 @@ export default function Header() {
                   </div>
                 </div>
                 <Link
-                  href={userProfile ? `/profile/${userProfile.id}/settings` : "/settings"}
+                  href={
+                    userProfile
+                      ? `/profile/${userProfile.id}/settings`
+                      : "/settings"
+                  }
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
                 >
                   Settings
                 </Link>
-
               </div>
             ) : (
               <div className="flex items-center gap-4 px-8 py-6">

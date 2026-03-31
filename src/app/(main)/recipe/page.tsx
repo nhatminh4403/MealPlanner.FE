@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 import { recipes as recipeApi } from "@/libs/api";
 import { userProfiles } from "@/libs/api";
 import { getAccessToken } from "@/libs/axios";
@@ -18,10 +20,13 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { useLocalization } from "@/libs/localization";
 
 const PAGE_SIZE = 10;
 
 export default function RecipePage() {
+  const router = useRouter();
+  const { L } = useLocalization();
   const [userRecipes, setUserRecipes] = useState<RecipeSummary[]>([]);
   const [allRecipes, setAllRecipes] = useState<RecipeSummary[]>([]);
   const [allRecipesTotal, setAllRecipesTotal] = useState(0);
@@ -82,7 +87,7 @@ export default function RecipePage() {
     fetchAllRecipes();
   }, [allRecipesPage, searchTerm]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.SubmitEvent) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setAllRecipesPage(1); // Reset to first page when search changes
@@ -145,13 +150,13 @@ export default function RecipePage() {
       {/* Search Header - Stationary */}
       <div className="shrink-0">
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">
-          Browse Recipes
+          {L("MealPlannerAPI", "BrowseRecipes")}
         </h1>
         <form onSubmit={handleSearch} className="mt-6 flex gap-3 max-w-2xl">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
             <Input
-              placeholder="Search recipes..."
+              placeholder={L("MealPlannerAPI", "SearchRecipesPlaceholder")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10 h-11"
@@ -162,7 +167,7 @@ export default function RecipePage() {
             size="lg"
             className="px-8 transition-all active:scale-95"
           >
-            Search
+            {L("MealPlannerAPI", "Search")}
           </Button>
         </form>
       </div>
@@ -171,13 +176,20 @@ export default function RecipePage() {
         {/* My Creations Section - Contained Scroll */}
         {isLoggedIn && (
           <section className="flex flex-col">
-            <div className="flex items-center gap-3 mb-4 shrink-0 px-1">
-              <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+            <div className="flex items-center justify-between  gap-3 mb-4 shrink-0 px-1">
+              <div className="flex items-center gap-3 p-1.5 rounded-lg bg-primary/10 text-primary">
                 <User className="w-5 h-5" />
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                  {L("MealPlannerAPI", "MyCreations")}
+                </h2>
               </div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-                My Creations
-              </h2>
+
+              <Button
+                onClick={() => router.push("/recipe/add")}
+                className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 active:scale-[0.98]"
+              >
+                {L("MealPlannerAPI", "AddRecipe")}
+              </Button>
             </div>
             <div className="pr-2 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20 p-4">
               {loading.userRecipes ? (
@@ -190,7 +202,7 @@ export default function RecipePage() {
                   {userRecipes.length === 0 && (
                     <div className="col-span-full py-12 text-center">
                       <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-                        No recipes yet. Start sharing!
+                        {L("MealPlannerAPI", "NoUserRecipes")}
                       </p>
                     </div>
                   )}
@@ -208,11 +220,16 @@ export default function RecipePage() {
                 <LayoutGrid className="w-5 h-5" />
               </div>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-                {searchTerm ? `Results for "${searchTerm}"` : "All Recipes"}
+                {searchTerm
+                  ? L("MealPlannerAPI", "ResultsFor").replace("{0}", searchTerm)
+                  : L("MealPlannerAPI", "AllRecipes")}
               </h2>
             </div>
             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-              {allRecipesTotal} found
+              {L("MealPlannerAPI", "Found").replace(
+                "{0}",
+                allRecipesTotal.toString(),
+              )}
             </p>
           </div>
 
@@ -261,7 +278,9 @@ export default function RecipePage() {
                             ? "pointer-events-none opacity-40"
                             : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
                         }
-                      />
+                      >
+                        {L("MealPlannerAPI", "Previous")}
+                      </PaginationPrevious>
                     </PaginationItem>
 
                     {getPageNumbers().map((page, idx) => (
@@ -300,7 +319,9 @@ export default function RecipePage() {
                             ? "pointer-events-none opacity-40"
                             : "cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
                         }
-                      />
+                      >
+                        {L("MealPlannerAPI", "Next")}
+                      </PaginationNext>
                     </PaginationItem>
                   </PaginationContent>
                 </div>

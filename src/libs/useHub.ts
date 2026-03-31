@@ -3,14 +3,23 @@
 import { useEffect, useRef, useLayoutEffect } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
 import { getHubConnection, startHub, stopHub, HubEvents } from "./signalR-hub";
-import { UserNotification, MealPlan, ShoppingList, ShoppingListItem, DashboardStats } from "./interfaceDTO";
+import {
+  UserNotification,
+  MealPlan,
+  ShoppingList,
+  ShoppingListItem,
+  DashboardStats,
+} from "./interfaceDTO";
 
 type HubEventHandlers = Partial<{
   onTrendingUpdated: () => void;
   onStatsUpdated: (stats: DashboardStats) => void;
   onMealPlanUpdated: (mealPlan: MealPlan) => void;
   onShoppingListUpdated: (shoppingList: ShoppingList) => void;
-  onShoppingItemToggled: (shoppingListId: string, item: ShoppingListItem) => void;
+  onShoppingItemToggled: (
+    shoppingListId: string,
+    item: ShoppingListItem,
+  ) => void;
   onNotificationReceived: (notification: UserNotification) => void;
   onUnreadCountChanged: (count: number) => void;
 }>;
@@ -59,8 +68,8 @@ export const useHub = (handlers: HubEventHandlers = {}, enabled = true) => {
       hub.off(HubEvents.UnreadCountChanged, onUnreadCount);
       if (hub.state === HubConnectionState.Connected) {
         const hasListeners = Object.values(HubEvents).some(
-          (event) => (hub as unknown as { _closedCallbacks?: unknown[] })
-            ?? event
+          (event) =>
+            (hub as unknown as { _closedCallbacks?: unknown[] }) ?? event,
         );
         if (!hasListeners) stopHub().catch(console.error);
       }

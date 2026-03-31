@@ -15,9 +15,10 @@ export function MealPlanEmptyState({ onGenerate }: MealPlanEmptyStateProps) {
         Start Your Journey
       </h3>
       <p className="text-zinc-500 dark:text-zinc-400 max-w-md mb-8 leading-relaxed">
-        Your meal plan is currently empty. Design your perfect week of eating with our auto-generator or by adding your favorite recipes.
+        Your meal plan is currently empty. Design your perfect week of eating
+        with our auto-generator or by adding your favorite recipes.
       </p>
-      <button 
+      <button
         onClick={onGenerate}
         className="px-8 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-bold hover:scale-[1.02] transition-all shadow-xl dark:shadow-zinc-900/20"
       >

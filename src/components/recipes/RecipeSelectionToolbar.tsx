@@ -7,7 +7,11 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface RecipeSelectionToolbarProps {
   searchTerm: string;
   onSearchChange: (val: string) => void;
-  tabs: { value: string; label: string; icon: React.ComponentType<{ size?: number }> }[];
+  tabs: {
+    value: string;
+    label: string;
+    icon: React.ComponentType<{ size?: number }>;
+  }[];
 }
 
 export default function RecipeSelectionToolbar({

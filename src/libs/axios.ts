@@ -1,7 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
-const DOCKER_API_URL = process.env.NEXT_PUBLIC_DOCKER_API_URL || "https://localhost:44339";
+const DOCKER_API_URL =
+  process.env.NEXT_PUBLIC_DOCKER_API_URL || "https://localhost:44339";
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -14,6 +15,9 @@ export const dockerApi = axios.create({
 });
 
 // ── Interceptor Helpers ──────────────────────────────────────────────────────
+export const getApiInstance = () => {
+  return process.env.NEXT_PUBLIC_USE_DOCKER_API === "true" ? dockerApi : api;
+};
 
 const requestInterceptor = (config: InternalAxiosRequestConfig) => {
   if (typeof window === "undefined") return config;
@@ -101,7 +105,7 @@ export interface LoginResult {
 
 export const login = async (
   username: string,
-  password: string
+  password: string,
 ): Promise<LoginResult> => {
   const res = await fetch(`${API_URL}/connect/token`, {
     method: "POST",

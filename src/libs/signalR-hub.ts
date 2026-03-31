@@ -2,7 +2,8 @@ import * as signalR from "@microsoft/signalr";
 import { getAccessToken } from "./axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
-const DOCKER_API_URL = process.env.NEXT_PUBLIC_DOCKER_API_URL || "http://localhost:44339";
+const DOCKER_API_URL =
+  process.env.NEXT_PUBLIC_DOCKER_API_URL || "http://localhost:44339";
 
 const HUB_URL = `${API_URL}/signalr-hubs/meal-planner`;
 const DOCKER_HUB_URL = `${DOCKER_API_URL}/signalr-hubs/meal-planner`;
@@ -20,7 +21,7 @@ export const getHubConnection = (): signalR.HubConnection => {
       .configureLogging(
         process.env.NODE_ENV === "development"
           ? signalR.LogLevel.Information
-          : signalR.LogLevel.Error
+          : signalR.LogLevel.Error,
       )
       .build();
   }
@@ -37,7 +38,7 @@ export const getDockerHubConnection = (): signalR.HubConnection => {
       .configureLogging(
         process.env.NODE_ENV === "development"
           ? signalR.LogLevel.Information
-          : signalR.LogLevel.Error
+          : signalR.LogLevel.Error,
       )
       .build();
   }
@@ -95,7 +96,7 @@ export const stopDockerHub = async (): Promise<void> => {
 
 export const subscribeShoppingList = (
   shoppingListId: string,
-  subscribe: boolean = true
+  subscribe: boolean = true,
 ): Promise<void> => {
   const hub = getHubConnection();
   return hub.invoke("SubscribeShoppingList", shoppingListId, subscribe);
@@ -103,7 +104,7 @@ export const subscribeShoppingList = (
 
 export const subscribeDockerShoppingList = (
   shoppingListId: string,
-  subscribe: boolean = true
+  subscribe: boolean = true,
 ): Promise<void> => {
   const hub = getDockerHubConnection();
   return hub.invoke("SubscribeShoppingList", shoppingListId, subscribe);

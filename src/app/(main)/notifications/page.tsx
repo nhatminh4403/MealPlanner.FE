@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { notifications } from "@/libs/api";
 import { UserNotification } from "@/libs/interfaceDTO";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { formatDistanceToNow } from "date-fns";
 import {
   Inbox,
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useNotifications } from "@/libs/NotificationProvider";
 import { isAuthenticated } from "@/libs/axios";
 import { useRouter } from "next/navigation";
+import { useLocalization } from "@/libs/localization";
 
 const TYPE_CONFIG: Record<
   string,
@@ -52,6 +53,7 @@ function getTypeConfig(type?: string) {
 }
 
 export default function NotificationsPage() {
+  const { L } = useLocalization();
   const router = useRouter();
   const [items, setItems] = useState<UserNotification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,32 +68,32 @@ export default function NotificationsPage() {
     }
   }, [router]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!isAuthenticated()) return;
     try {
       const res = await notifications.getList({ maxResultCount: 100 });
       setItems(res.data.items);
     } catch (error) {
       console.error("Failed to fetch notifications", error);
-      toast.error("Failed to load notifications");
+      toast.error(L("MealPlannerAPI", "FailedToLoadNotifications"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [L]);
   useEffect(() => {
     loadNotifications();
-  }, [refreshKey]);
+  }, [loadNotifications, refreshKey]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
       await notifications.markRead(id);
       setItems((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, isRead: true } : i))
+        prev.map((i) => (i.id === id ? { ...i, isRead: true } : i)),
       );
       // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as read", error);
-      toast.error("Failed to mark as read");
+      toast.error(L("MealPlannerAPI", "FailedToMarkAsRead"));
     }
   };
 
@@ -99,12 +101,12 @@ export default function NotificationsPage() {
     try {
       await notifications.markUnread(id);
       setItems((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, isRead: false } : i))
+        prev.map((i) => (i.id === id ? { ...i, isRead: false } : i)),
       );
       // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as unread", error);
-      toast.error("Failed to mark as unread");
+      toast.error(L("MealPlannerAPI", "FailedToMarkAsUnread"));
     }
   };
 
@@ -113,14 +115,14 @@ export default function NotificationsPage() {
       const itemToDelete = items.find((i) => i.id === id);
       await notifications.delete(id);
       setItems((prev) => prev.filter((i) => i.id !== id));
-      
+
       if (itemToDelete && !itemToDelete.isRead) {
         // notifyChanges();
       }
-      toast.success("Notification deleted");
+      toast.success(L("MealPlannerAPI", "NotificationDeleted"));
     } catch (error) {
       console.error("Failed to delete notification", error);
-      toast.error("Failed to delete notification");
+      toast.error(L("MealPlannerAPI", "FailedToDeleteNotification"));
     }
   };
 
@@ -145,7 +147,7 @@ export default function NotificationsPage() {
     const item = items.find((i) => i.id === id);
     if (item && !item.isRead) {
       await handleMarkAsRead(id);
-      toast.success("Marked as read");
+      toast.success(L("MealPlannerAPI", "MarkedAsRead"));
     }
     setDraggedId(null);
   };
@@ -157,7 +159,7 @@ export default function NotificationsPage() {
     const item = items.find((i) => i.id === id);
     if (item && item.isRead) {
       await handleMarkAsUnread(id);
-      toast.success("Moved back to Unread");
+      toast.success(L("MealPlannerAPI", "MovedBackToUnread"));
     }
     setDraggedId(null);
   };
@@ -171,29 +173,29 @@ export default function NotificationsPage() {
         <div>
           <h1 className="flex items-center gap-3 text-3xl font-bold text-zinc-900 dark:text-white">
             <Bell className="h-8 w-8 text-primary" />
-            Inbox
+            {L("MealPlannerAPI", "Inbox")}
           </h1>
           <p className="mt-1 text-zinc-500">
-            Drag items back and forth between Unread and Activity to manage them.
+            {L("MealPlannerAPI", "NotificationsDescription")}
           </p>
         </div>
       </div>
 
       <div className="grid h-full flex-1 grid-cols-1 gap-6 overflow-hidden md:grid-cols-2">
         {/* UNREAD CONTAINER (Drop target for Read items) */}
-        <div 
+        <div
           onDragOver={onDragOver}
           onDrop={onDropToUnread}
           className={cn(
             "flex flex-col overflow-hidden rounded-3xl border transition-all shadow-sm",
-            draggedId && items.find(i => i.id === draggedId)?.isRead
+            draggedId && items.find((i) => i.id === draggedId)?.isRead
               ? "border-primary border-dashed bg-primary/5 ring-4 ring-primary/10"
-              : "border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/50"
+              : "border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/50",
           )}
         >
           <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
             <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-              Unread
+              {L("MealPlannerAPI", "Unread")}
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-white">
                 {unreadCount}
               </span>
@@ -208,7 +210,9 @@ export default function NotificationsPage() {
             ) : unreadItems.length === 0 ? (
               <div className="flex h-60 flex-col items-center justify-center p-8 text-center">
                 <Inbox className="mb-4 h-12 w-12 text-zinc-200 dark:text-zinc-800" />
-                <p className="text-sm font-medium text-zinc-400">All caught up!</p>
+                <p className="text-sm font-medium text-zinc-400">
+                  {L("MealPlannerAPI", "AllCaughtUp")}
+                </p>
               </div>
             ) : (
               <div className="p-2 space-y-1">
@@ -226,11 +230,13 @@ export default function NotificationsPage() {
                       <div className="flex h-5 w-5 shrink-0 items-center justify-center text-zinc-300 group-hover:text-zinc-400">
                         <GripHorizontal className="h-4 w-4" />
                       </div>
-                      
-                      <div className={cn(
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                        cfg.bg
-                      )}>
+
+                      <div
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                          cfg.bg,
+                        )}
+                      >
                         <Icon className={cn("h-5 w-5", cfg.color)} />
                       </div>
 
@@ -240,7 +246,9 @@ export default function NotificationsPage() {
                             {item.type}
                           </span>
                           <span className="text-[10px] text-zinc-400">
-                            {formatDistanceToNow(new Date(item.creationTime), { addSuffix: true })}
+                            {formatDistanceToNow(new Date(item.creationTime), {
+                              addSuffix: true,
+                            })}
                           </span>
                         </div>
                         {item.title && (
@@ -252,7 +260,7 @@ export default function NotificationsPage() {
                           {item.message}
                         </p>
                       </div>
-                      
+
                       <div className="absolute top-4 right-4 h-2 w-2 rounded-full bg-primary" />
                     </div>
                   );
@@ -263,22 +271,25 @@ export default function NotificationsPage() {
         </div>
 
         {/* READ CONTAINER (Drop target for Unread items) */}
-        <div 
+        <div
           onDragOver={onDragOver}
           onDrop={onDropToRead}
           className={cn(
             "flex flex-col overflow-hidden rounded-3xl border transition-all shadow-sm",
-            draggedId && !items.find(i => i.id === draggedId)?.isRead
-              ? "border-primary border-dashed bg-primary/5 ring-4 ring-primary/10" 
-              : "border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/20"
+            draggedId && !items.find((i) => i.id === draggedId)?.isRead
+              ? "border-primary border-dashed bg-primary/5 ring-4 ring-primary/10"
+              : "border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/20",
           )}
         >
           <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
             <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
-              Recent Activity
+              {L("MealPlannerAPI", "RecentActivity")}
             </h2>
             <span className="text-[10px] font-medium text-zinc-400">
-              {readItems.length} items
+              {L("MealPlannerAPI", "ItemsCount").replace(
+                "{0}",
+                readItems.length.toString(),
+              )}
             </span>
           </div>
 
@@ -286,10 +297,10 @@ export default function NotificationsPage() {
             {readItems.length === 0 ? (
               <div className="flex h-60 flex-col items-center justify-center p-8 text-center">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-50 dark:bg-zinc-900">
-                   <Bell className="h-8 w-8 text-zinc-200 dark:text-zinc-800" />
+                  <Bell className="h-8 w-8 text-zinc-200 dark:text-zinc-800" />
                 </div>
                 <p className="max-w-50 text-xs leading-relaxed text-zinc-400 italic">
-                  No recent activity to show.
+                  {L("MealPlannerAPI", "NoRecentActivity")}
                 </p>
               </div>
             ) : (
@@ -305,29 +316,33 @@ export default function NotificationsPage() {
                       onDragEnd={onDragEnd}
                       className="group flex cursor-grab items-start gap-4 rounded-2xl p-4 transition-all opacity-80 hover:bg-zinc-50 hover:opacity-100 active:cursor-grabbing dark:hover:bg-zinc-900/50 border border-transparent hover:border-zinc-100 dark:hover:border-zinc-700"
                     >
-                      <div className={cn(
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                        cfg.bg
-                      )}>
+                      <div
+                        className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                          cfg.bg,
+                        )}
+                      >
                         <Icon className={cn("h-5 w-5", cfg.color)} />
                       </div>
 
                       <div className="min-w-0 flex-1">
-                         <div className="flex items-center justify-between mb-1">
-                           <span className="text-[10px] font-medium text-zinc-400">
-                             {formatDistanceToNow(new Date(item.creationTime), { addSuffix: true })}
-                           </span>
-                           <button
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               handleDelete(item.id);
-                             }}
-                             className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:text-zinc-600 dark:hover:bg-red-950/30"
-                             aria-label="Delete notification"
-                           >
-                             <Trash2 className="h-4 w-4" />
-                           </button>
-                         </div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-medium text-zinc-400">
+                            {formatDistanceToNow(new Date(item.creationTime), {
+                              addSuffix: true,
+                            })}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(item.id);
+                            }}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:text-zinc-600 dark:hover:bg-red-950/30"
+                            aria-label="Delete notification"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                         {item.title && (
                           <h4 className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
                             {item.title}

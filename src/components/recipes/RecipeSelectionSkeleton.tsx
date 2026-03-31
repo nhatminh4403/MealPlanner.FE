@@ -1,7 +1,11 @@
 "use client";
 import React from "react";
 
-export default function RecipeSelectionSkeleton({ count = 10 }: { count?: number }) {
+export default function RecipeSelectionSkeleton({
+  count = 10,
+}: {
+  count?: number;
+}) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 3xl:grid-cols-7 gap-4">
       {Array.from({ length: count }).map((_, i) => (

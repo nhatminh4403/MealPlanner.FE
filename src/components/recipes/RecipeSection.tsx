@@ -24,9 +24,7 @@ export default function RecipeSection({
   return (
     <section className="mb-16 min-h-420px">
       <div className="flex items-center gap-2 mb-6">
-        <div className="flex items-center justify-center">
-          {icon}
-        </div>
+        <div className="flex items-center justify-center">{icon}</div>
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
           {title}
         </h2>

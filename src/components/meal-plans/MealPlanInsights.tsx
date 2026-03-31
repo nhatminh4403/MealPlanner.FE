@@ -1,6 +1,10 @@
 import React from "react";
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { MealPlan } from "@/libs/interfaceDTO";
 
@@ -25,13 +29,10 @@ export function MealPlanInsights({ userMealPlans }: MealPlanInsightsProps) {
   const filledSlots = allMeals.length;
   const completionPct = Math.round((filledSlots / totalSlots) * 100);
 
-  const uniqueRecipes = new Set(
-    allMeals.map((e) => e.recipeId).filter(Boolean)
-  ).size;
+  const uniqueRecipes = new Set(allMeals.map((e) => e.recipeId).filter(Boolean))
+    .size;
 
-  const daysWithAtLeastOneMeal = days.filter(
-    (d) => d.meals.length > 0
-  ).length;
+  const daysWithAtLeastOneMeal = days.filter((d) => d.meals.length > 0).length;
 
   // ── Breakdown by meal type ────────────────────────────────────────────────
   const byType = allMeals.reduce<Record<number, number>>((acc, e) => {
@@ -40,7 +41,7 @@ export function MealPlanInsights({ userMealPlans }: MealPlanInsightsProps) {
   }, {});
 
   const mostFrequentType = Object.entries(byType).sort(
-    ([, a], [, b]) => b - a
+    ([, a], [, b]) => b - a,
   )[0];
 
   // ── Plan status ───────────────────────────────────────────────────────────
@@ -48,8 +49,8 @@ export function MealPlanInsights({ userMealPlans }: MealPlanInsightsProps) {
     completionPct === 100
       ? "Complete ✓"
       : completionPct >= 50
-      ? "In Progress"
-      : "Just Started";
+        ? "In Progress"
+        : "Just Started";
 
   // ── Week label ────────────────────────────────────────────────────────────
   const weekLabel = userMealPlans?.weekStartDate
@@ -68,12 +69,16 @@ export function MealPlanInsights({ userMealPlans }: MealPlanInsightsProps) {
     {
       label: "Unique Recipes",
       value: uniqueRecipes.toString(),
-      sub: uniqueRecipes === filledSlots ? "All different!" : `across ${filledSlots} meals`,
+      sub:
+        uniqueRecipes === filledSlots
+          ? "All different!"
+          : `across ${filledSlots} meals`,
     },
     {
       label: "Active Days",
       value: `${daysWithAtLeastOneMeal} / 7`,
-      sub: daysWithAtLeastOneMeal === 7 ? "Full week covered" : "days have meals",
+      sub:
+        daysWithAtLeastOneMeal === 7 ? "Full week covered" : "days have meals",
     },
     {
       label: "Most Planned",
