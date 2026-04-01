@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { recipes as recipeApi } from "@/libs/api";
 import { dashboard } from "@/libs/api";
-import RecipeSection from "../components/recipes/RecipeSection";
+import RecipeSection from "../components/recipes/base/RecipeSection";
 import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 import { Star, TrendingUp } from "lucide-react";
 import { useLocalization } from "@/libs/localization";

@@ -194,9 +194,16 @@ export default function AddRecipePage() {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in">
+    <div className="relative w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in bg-gradient-mesh overflow-hidden">
       <RecipeHeader />
 
+      {/* Glassmorphism decorative blobs */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-32 -left-32 size-130 rounded-full bg-primary/20 blur-3xl opacity-60 dark:opacity-40" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -right-32 size-105 rounded-full bg-secondary/20 blur-3xl opacity-60 dark:opacity-40" />
+      <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-150 rounded-full bg-primary/10 blur-[80px] opacity-40 dark:opacity-20" />
+
+      {/* Frosted glass content card */}
+      <div className="relative z-10 rounded-3xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-zinc-900/55 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/40 px-4 sm:px-6 py-6">
       <div className="grid gap-6">
         <BasicInfoSection
           form={form}
@@ -250,6 +257,7 @@ export default function AddRecipePage() {
           </Button>
         </div>
       </div>
+      </div>{/* /frosted glass card */}
     </div>
   );
 }

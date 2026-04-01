@@ -8,11 +8,11 @@ import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 import { toast } from "sonner";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { MealType, DayOfWeek } from "@/libs/enums";
-import RecipeSelectionGrid from "@/components/recipes/RecipeSelectionGrid";
-import RecipeSelectionSkeleton from "@/components/recipes/RecipeSelectionSkeleton";
-import EmptyRecipesState from "@/components/recipes/EmptyRecipesState";
+import RecipeSelectionGrid from "@/components/recipes/selection/RecipeSelectionGrid";
+import RecipeSelectionSkeleton from "@/components/recipes/selection/RecipeSelectionSkeleton";
+import EmptyRecipesState from "@/components/recipes/base/EmptyRecipesState";
 import AddMealPlanHeader from "@/components/meal-plans/selection/AddMealPlanHeader";
-import RecipeSelectionToolbar from "@/components/recipes/RecipeSelectionToolbar";
+import RecipeSelectionToolbar from "@/components/recipes/selection/RecipeSelectionToolbar";
 
 const MEAL_TYPES = [
   { label: "Breakfast", value: MealType.Breakfast },

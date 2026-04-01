@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { recipes as recipeApi } from "@/libs/api";
 import { userProfiles } from "@/libs/api";
 import { getAccessToken } from "@/libs/axios";
-import RecipeCard from "../../../components/recipes/RecipeCard";
+import RecipeCard from "../../../components/recipes/base/RecipeCard";
 import type { RecipeSummary } from "@/libs/interfaceDTO";
 import { User, Search, LayoutGrid } from "lucide-react";
 import { Input } from "@/components/ui/input";
