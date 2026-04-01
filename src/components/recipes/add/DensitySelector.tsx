@@ -28,8 +28,8 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
         <SelectTrigger
           className={cn(
             "h-7 text-xs flex-1 min-w-0",
-            "bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--foreground)]",
-            "hover:border-primary/50 focus:border-primary focus:ring-[var(--input-ring)]",
+            "bg-(--input-bg) border-(--input-border) text-foreground",
+            "hover:border-primary/50 focus:border-primary focus:ring-(--input-ring)",
             "transition-colors duration-150",
           )}
         >
@@ -37,8 +37,8 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
         </SelectTrigger>
         <SelectContent
           className={cn(
-            "bg-[var(--popover-bg)] border-[var(--popover-border)]",
-            "text-[var(--foreground)] shadow-lg shadow-black/10 dark:shadow-black/40",
+            "bg-(--popover-bg) border-(--popover-border)",
+            "text-foreground shadow-lg shadow-black/10 dark:shadow-black/40",
           )}
         >
           {DENSITY_PRESETS.map((p) => (
@@ -48,11 +48,11 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
               className={cn(
                 "text-xs cursor-pointer",
                 "focus:bg-primary/10 focus:text-primary",
-                "data-[highlighted]:bg-primary/10 data-[highlighted]:text-primary",
+                "data-highlighted:bg-primary/10 data-highlighted:text-primary",
               )}
             >
               <span>{p.label}</span>
-              <span className="ml-2 text-[var(--muted-fg)]">
+              <span className="ml-2 text(--muted-fg)">
                 {p.density} g/ml
               </span>
             </SelectItem>
@@ -64,8 +64,8 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
         type="number"
         className={cn(
           "h-7 w-20 text-xs text-center font-medium shrink-0",
-          "bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--foreground)]",
-          "focus:border-primary focus:ring-[var(--input-ring)]",
+          "bg-(--input-bg) border(--input-border) text(--foreground)",
+          "focus:border-primary focus:ring-(--input-ring)",
           "transition-colors duration-150",
         )}
         step={0.01}
@@ -74,7 +74,7 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
         onChange={(e) => onChange(Number(e.target.value))}
         placeholder="g/ml"
       />
-      <span className="text-[10px] text-[var(--muted-fg)] shrink-0">g/ml</span>
+      <span className="text-[10px] text-(--muted-fg) shrink-0">g/ml</span>
     </div>
   );
 }
