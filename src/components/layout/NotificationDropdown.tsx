@@ -10,7 +10,7 @@ import {
 import { notifications as notificationsApi } from "@/libs/api";
 import { UserNotification } from "@/libs/interfaceDTO";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "@/libs/NotificationProvider";
 import {

@@ -77,9 +77,9 @@ export default function AddRecipePage() {
       form.tags.filter((t) => t !== tag),
     );
 
-  const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
+const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
     setIngredients((prev) =>
-      prev.map((r) => (r.key === key ? { ...r, ...patch } : r)),
+      prev.map((r) => (r.key === key ? resolveRow({ ...r, ...patch }) : r)), // <--- ADD resolveRow(...) here
     );
 
   const addIngredient = () =>
@@ -116,23 +116,7 @@ export default function AddRecipePage() {
         L("MealPlannerAPI", "AtLeastOneIngredientIsRequired") ||
         "At least one ingredient is required."
       );
-    for (const ing of form.ingredients) {
-      if (!ing.name.trim())
-        return (
-          L("MealPlannerAPI", "EveryIngredientNeedsAName") ||
-          "Every ingredient needs a name."
-        );
-      if (ing.quantity <= 0)
-        return (
-          L("MealPlannerAPI", "IngredientQuantityMustBeGreaterThanZero") ||
-          "Ingredient quantity must be greater than 0."
-        );
-      if (!ing.unit.trim())
-        return (
-          L("MealPlannerAPI", "EveryIngredientNeedsAUnit") ||
-          "Every ingredient needs a unit."
-        );
-    }
+
     for (const row of ingredients) {
       if (!row.name.trim()) return "Every ingredient needs a name.";
       if (row.conversionStatus === "needs-density")
@@ -171,7 +155,7 @@ export default function AddRecipePage() {
       const response = await recipes.create(payload);
       toast.success(
         L("MealPlannerAPI", "RecipeCreatedSuccessfully") ||
-          "Recipe created successfully!",
+        "Recipe created successfully!",
       );
       router.push(`/recipe/${response.data.id}`);
       setForm(emptyForm());
@@ -179,13 +163,13 @@ export default function AddRecipePage() {
       if (axios.isAxiosError(err)) {
         toast.error(
           err.response?.data?.error?.message ??
-            L("MealPlannerAPI", "FailToAddRecipe") ??
-            "Failed to add recipe",
+          L("MealPlannerAPI", "FailToAddRecipe") ??
+          "Failed to add recipe",
         );
       } else {
         toast.error(
           L("AbpUi", "UnexpectedErrorOccurred") ??
-            "An unexpected error occurred",
+          "An unexpected error occurred",
         );
       }
     } finally {
@@ -195,42 +179,8 @@ export default function AddRecipePage() {
 
   return (
     <div className="relative w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in bg-gradient-mesh overflow-hidden">
-      <RecipeHeader />
-
-      {/* Glassmorphism decorative blobs */}
-      <div aria-hidden="true" className="pointer-events-none absolute -top-32 -left-32 size-130 rounded-full bg-primary/20 blur-3xl opacity-60 dark:opacity-40" />
-      <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -right-32 size-105 rounded-full bg-secondary/20 blur-3xl opacity-60 dark:opacity-40" />
-      <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-150 rounded-full bg-primary/10 blur-[80px] opacity-40 dark:opacity-20" />
-
-      {/* Frosted glass content card */}
-      <div className="relative z-10 rounded-3xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-zinc-900/55 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/40 px-4 sm:px-6 py-6">
-      <div className="grid gap-6">
-        <BasicInfoSection
-          form={form}
-          set={set}
-          tagInput={tagInput}
-          setTagInput={setTagInput}
-          commitTag={commitTag}
-          removeTag={removeTag}
-        />
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <IngredientsSection
-            ingredients={ingredients}
-            onAdd={addIngredient}
-            onRemove={removeIngredient}
-            onUpdate={updateIngredient}
-          />
-
-          <InstructionsSection
-            instructions={form.instructions}
-            addInstruction={addInstruction}
-            removeInstruction={removeInstruction}
-            updateInstruction={updateInstruction}
-          />
-        </div>
-
-        <div className="mt-4 flex justify-end gap-3 pb-12">
+      <RecipeHeader >
+        <div className="flex justify-end gap-3 pb-12">
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -256,8 +206,38 @@ export default function AddRecipePage() {
             )}
           </Button>
         </div>
+      </RecipeHeader>
+      {/* Frosted glass content card */}
+      <div className="relative z-10 rounded-3xl border px-4 sm:px-6 py-6">
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <BasicInfoSection
+              form={form}
+              set={set}
+              tagInput={tagInput}
+              setTagInput={setTagInput}
+              commitTag={commitTag}
+              removeTag={removeTag}
+            />
+          </div>
+          <div className="lg:col-span-2 flex flex-col gap-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+            <IngredientsSection
+              ingredients={ingredients}
+              onAdd={addIngredient}
+              onRemove={removeIngredient}
+              onUpdate={updateIngredient}
+            />
+
+            <InstructionsSection
+              instructions={form.instructions}
+              addInstruction={addInstruction}
+              removeInstruction={removeInstruction}
+              updateInstruction={updateInstruction}
+            />
+
+          </div>
+        </div>
       </div>
-      </div>{/* /frosted glass card */}
     </div>
   );
 }

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 
 interface UnitSelectProps {
   value: Unit | null;

@@ -19,7 +19,7 @@ import { UnitSelect } from "./UnitSelect";
 import { IngredientSearch } from "./IngredientSearch";
 import { DensitySelector } from "./DensitySelector";
 import { resolveRow } from "@/libs/ingredient-row-helpers";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 
 interface IngredientsSectionProps {
   ingredients: IngredientRow[];
@@ -38,10 +38,10 @@ export function IngredientsSection({
 
   const update = (key: string, patch: Partial<IngredientRow>) => {
     // Always re-resolve after any patch so grams stay in sync
-    const current = ingredients.find((r) => r.key === key)!;
-    const merged = { ...current, ...patch };
-    const resolved = resolveRow(merged);
-    onUpdate(key, resolved);
+    // const current = ingredients.find((r) => r.key === key)!;
+    // const merged = { ...current, ...patch };
+    // const resolved = resolveRow(merged);
+    onUpdate(key, patch);
   };
 
   return (

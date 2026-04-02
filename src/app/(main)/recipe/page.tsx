@@ -159,7 +159,7 @@ export default function RecipePage() {
               placeholder={L("MealPlannerAPI", "SearchRecipesPlaceholder")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10 h-11"
+              className="pl-10 h-11 border-black/50 dark:border-input"
             />
           </div>
           <Button

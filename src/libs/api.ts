@@ -178,16 +178,16 @@ export const dashboard = {
 export const ingredientNutritions = {
   search: (query: string, includeExternal = false) =>
     http().get<IngredientNutritionSearchResultDto>(
-      "/app/ingredient-nutritions/search",
+      "/app/nutritions/search",
       { params: { query, includeExternal } },
     ),
 
   create: (data: CreateIngredientNutritionDto) =>
-    http().post<IngredientNutritionDto>("/app/ingredient-nutritions", data),
+    http().post<IngredientNutritionDto>("/app/nutritions", data),
 
   getList: (params?: { skipCount?: number; maxResultCount?: number }) =>
     http().get<{ items: IngredientNutritionDto[]; totalCount: number }>(
-      "/app/ingredient-nutritions",
+      "/app/nutritions",
       { params },
     ),
 };

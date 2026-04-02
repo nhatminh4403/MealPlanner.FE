@@ -1,17 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { Children } from "react";
 import { useLocalization } from "@/libs/localization";
 import { ChefHat, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export function RecipeHeader() {
+export function RecipeHeader({ children }: { children?: React.ReactNode }) {
   const { L } = useLocalization();
   const router = useRouter();
 
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className=" flex items-center justify-between">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
@@ -36,6 +36,9 @@ export function RecipeHeader() {
           </div>
         </div>
       </div>
+
+        {children}
+
     </div>
   );
 }

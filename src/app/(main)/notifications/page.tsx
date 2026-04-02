@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { notifications } from "@/libs/api";
 import { UserNotification } from "@/libs/interfaceDTO";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import {
   Inbox,
