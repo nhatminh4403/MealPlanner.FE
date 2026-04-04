@@ -8,6 +8,7 @@ import { NotificationProvider } from "@/libs/NotificationProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
+import { ApiDownModal } from "@/components/layout/ApiDownModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 text-zinc-900 transition-colors duration-300 dark:bg-black dark:text-zinc-50`}
       >
+        <ApiDownModal />
         <ThemeProvider>
           <LocalizationProvider>
             <NotificationProvider>
