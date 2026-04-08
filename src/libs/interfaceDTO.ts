@@ -315,3 +315,20 @@ export interface Unit {
   /** Grams per unit for weight; ml per unit for volume; null for count */
   factor: number | null;
 }
+
+export  interface AbpApplicationConfiguration  {
+  localization: {
+   values: Record<string, Record<string, string>>;
+  };
+  auth: {
+    grantedPolicies: Record<string, boolean>;
+  };
+  currentUser: {
+    id: string | null;
+    userName: string | null;
+    isAuthenticated: boolean;
+  };
+  setting:{
+    values: Record<string, string>;
+  };
+}

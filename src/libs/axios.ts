@@ -1,4 +1,5 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import * as mockData from "./mockData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
 const DOCKER_API_URL =
@@ -14,6 +15,19 @@ export const dockerApi = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// ── Demo Mode helpers ─────────────────────────────────────────────────────────
+
+const DEMO_MODE_KEY = "use_demo_mode";
+
+export const isDemoMode = () =>
+  typeof window !== "undefined" && localStorage.getItem(DEMO_MODE_KEY) === "true";
+
+export const setDemoMode = (enabled: boolean) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(DEMO_MODE_KEY, enabled.toString());
+  }
+};
+
 // ── Interceptor Helpers ──────────────────────────────────────────────────────
 export const getApiInstance = () => {
   return process.env.NEXT_PUBLIC_USE_DOCKER_API === "true" ? dockerApi : api;
@@ -27,6 +41,9 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
 };
 
 const responseInterceptorError = async (error: AxiosError) => {
+  if (isDemoMode()) {
+    return Promise.reject(error); // In demo mode, we shouldn't really hit errors if mocked, but just in case
+  }
   const original = error.config as typeof error.config & { _retry?: boolean };
 
   if (error.response?.status === 401 && !original?._retry) {
@@ -47,10 +64,60 @@ const responseInterceptorError = async (error: AxiosError) => {
   return Promise.reject(error);
 };
 
+// ── Mock Interceptor ──────────────────────────────────────────────────────────
+
+const mockInterceptor = async (config: InternalAxiosRequestConfig) => {
+  if (!isDemoMode()) return config;
+
+  const url = config.url || "";
+  let data: unknown = null;
+
+  // Simple URL matching for mock data
+  if (url.includes("/abp/application-localization")) data = mockData.MOCK_LOCALIZATION;
+  else if (url.includes("/abp/application-configuration")) data = mockData.MOCK_CONFIG;
+  else if (url.includes("/app/recipe/top-rated")) data = { items: mockData.MOCK_RECIPES_SUMMARY };
+  else if (url.includes("/app/recipe")) {
+    const segments = url.split("/");
+    const id = segments[segments.length - 1];
+
+    if (id === "recipe" || config.params?.skipCount !== undefined) {
+      // List request
+      data = { items: mockData.MOCK_RECIPES_SUMMARY, totalCount: mockData.MOCK_RECIPES_SUMMARY.length };
+    } else {
+      // Single recipe request
+      data = mockData.MOCK_RECIPES[id] || mockData.MOCK_RECIPES["r1"]; // Fallback to r1 if ID not found
+    }
+  }
+  else if (url.includes("/app/meal-plans")) data = mockData.MOCK_MEAL_PLAN;
+  else if (url.includes("/app/shopping-lists")) data = mockData.MOCK_SHOPPING_LISTS;
+  else if (url.includes("/app/user/me")) data = mockData.MOCK_USER;
+  else if (url.includes("/app/dashboard/stats")) data = mockData.MOCK_STATS;
+  else if (url.includes("/app/dashboard/trending")) data = { items: mockData.MOCK_TRENDING };
+
+  if (data) {
+    // Return a custom response that axios will handle as a success
+    return {
+      ...config,
+      adapter: async () => ({
+        data,
+        status: 200,
+        statusText: "OK",
+        headers: config.headers,
+        config,
+        request: {},
+      } as AxiosResponse),
+    };
+  }
+
+  return config;
+};
+
 // Apply interceptors
+api.interceptors.request.use(mockInterceptor);
 api.interceptors.request.use(requestInterceptor);
 api.interceptors.response.use((res) => res, responseInterceptorError);
 
+dockerApi.interceptors.request.use(mockInterceptor);
 dockerApi.interceptors.request.use(requestInterceptor);
 dockerApi.interceptors.response.use((res) => res, responseInterceptorError);
 

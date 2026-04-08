@@ -249,8 +249,8 @@ export default function RecipeDetailPage() {
               {recipe.prepTimeMinutes > 0 && (
                 <span className="text-zinc-400 dark:text-zinc-500">
                   {L("MealPlannerAPI", "PrepAndCookTime")
-                    .replace("{0}", recipe.prepTimeMinutes.toString())
-                    .replace("{1}", recipe.cookingTimeMinutes.toString())}
+                    .replace("{0}", (recipe.prepTimeMinutes ?? 0).toString())
+                    .replace("{1}", (recipe.cookingTimeMinutes ?? 0).toString())}
                 </span>
               )}
             </div>
@@ -259,7 +259,7 @@ export default function RecipeDetailPage() {
               <span>
                 {L("MealPlannerAPI", "ServingsCount").replace(
                   "{0}",
-                  recipe.servings.toString(),
+                  (recipe.servings ?? 0 ).toString(),
                 )}
               </span>
             </div>
