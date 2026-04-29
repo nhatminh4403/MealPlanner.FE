@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { notifications } from "@/libs/api";
 import { isAuthenticated } from "@/libs/axios";
-import { useHub } from "@/libs/useHub";
+import { useHub } from "@/hooks/useHub";
 import { UserNotification } from "@/libs/interfaceDTO";
 
 interface NotificationContextType {

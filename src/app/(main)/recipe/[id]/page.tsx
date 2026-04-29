@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { userProfiles } from "@/libs/api";
 import type { UserProfile } from "@/libs/interfaceDTO";
 import { isAuthenticated } from "@/libs/axios";
@@ -31,9 +31,9 @@ import { isAuthenticated } from "@/libs/axios";
 const getDifficultyLabels = (
   L: (resourceName: string, key: string) => string,
 ): Record<number, string> => ({
-  0: L("MealPlannerAPI", "Easy"),
-  1: L("MealPlannerAPI", "Medium"),
-  2: L("MealPlannerAPI", "Hard"),
+  0: L("MealPlannerAPI", "Unit:Easy"),
+  1: L("MealPlannerAPI", "Unit:Medium"),
+  2: L("MealPlannerAPI", "Unit:Hard"),
 });
 
 const PLACEHOLDER_IMAGE =
@@ -113,8 +113,8 @@ export default function RecipeDetailPage() {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16 flex flex-col items-center justify-center min-h-[50vh]">
         <Loader2 className="w-12 h-12 animate-spin text-amber-500 mb-4" />
-        <p className="text-zinc-500 dark:text-zinc-400">
-          {L("MealPlannerAPI", "LoadingRecipe")}
+        <p className="text-muted-foreground">
+          {L("MealPlannerAPI", "Recipes:Loading")}
         </p>
       </div>
     );
@@ -123,16 +123,12 @@ export default function RecipeDetailPage() {
   if (error || !recipe) {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16 text-center">
-        <p className="text-zinc-600 dark:text-zinc-400 mb-4">
-          {error ?? L("MealPlannerAPI", "RecipeNotFound")}
+        <p className="text-muted-foreground mb-4">
+          {error ?? L("MealPlannerAPI", "Recipes:NotFound")}
         </p>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/recipe")}
-          className="cursor-default"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {L("MealPlannerAPI", "BackToRecipes")}
+        <Button variant="outline" onClick={() => router.push("/recipe")}>
+          <ArrowLeft className="w-4 h-4 mr-2" aria-hidden="true" />
+          {L("MealPlannerAPI", "Recipes:BackToList")}
         </Button>
       </div>
     );
@@ -151,8 +147,8 @@ export default function RecipeDetailPage() {
             className="mb-4 -ml-2"
             onClick={() => router.push("/recipe")}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {L("MealPlannerAPI", "BackToRecipes")}
+            <ArrowLeft className="w-4 h-4 mr-2" aria-hidden="true" />
+            {L("MealPlannerAPI", "Recipes:BackToList")}
           </Button>{" "}
         </div>
 
@@ -232,7 +228,7 @@ export default function RecipeDetailPage() {
                 {recipe.rating?.toFixed(1) ?? "—"}
               </span>
               <span>
-                {L("MealPlannerAPI", "ReviewsCount").replace(
+                {L("MealPlannerAPI", "Recipes:ReviewsCount").replace(
                   "{0}",
                   (recipe.reviewCount ?? 0).toString(),
                 )}
@@ -241,25 +237,28 @@ export default function RecipeDetailPage() {
             <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
               <Clock className="w-5 h-5" />
               <span>
-                {L("MealPlannerAPI", "MinTotal").replace(
+                {L("MealPlannerAPI", "Recipes:MinTotal").replace(
                   "{0}",
                   totalTime.toString(),
                 )}
               </span>
               {recipe.prepTimeMinutes > 0 && (
                 <span className="text-zinc-400 dark:text-zinc-500">
-                  {L("MealPlannerAPI", "PrepAndCookTime")
+                  {L("MealPlannerAPI", "Recipes:PrepAndCookTime")
                     .replace("{0}", (recipe.prepTimeMinutes ?? 0).toString())
-                    .replace("{1}", (recipe.cookingTimeMinutes ?? 0).toString())}
+                    .replace(
+                      "{1}",
+                      (recipe.cookingTimeMinutes ?? 0).toString(),
+                    )}
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
               <Users className="w-5 h-5" />
               <span>
-                {L("MealPlannerAPI", "ServingsCount").replace(
+                {L("MealPlannerAPI", "Recipes:ServingsCount").replace(
                   "{0}",
-                  (recipe.servings ?? 0 ).toString(),
+                  (recipe.servings ?? 0).toString(),
                 )}
               </span>
             </div>
@@ -292,52 +291,57 @@ export default function RecipeDetailPage() {
 
           {/* Nutrition */}
           {recipe.nutritionPerServing && (
-            <section className="p-4 mt-[32] rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-              <h2 className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-                <Flame className="w-5 h-5 text-amber-500" />
-                {L("MealPlannerAPI", "NutritionPerServing")}
+            <section className="p-5 rounded-2xl bg-primary-secondary-45 border border-primary/10 shadow-brand-glow-sm">
+              <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground mb-4">
+                <Flame className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                {L("MealPlannerAPI", "Recipes:NutritionPerServing")}
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                <div className="text-center p-2 rounded-lg bg-white dark:bg-zinc-800/50">
-                  <p className="text-xl font-bold text-amber-600 dark:text-amber-400">
-                    {Math.round(recipe.nutritionPerServing.calories)}
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {L("MealPlannerAPI", "Calories")}
-                  </p>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-white dark:bg-zinc-800/50">
-                  <p className="text-xl font-bold text-zinc-900 dark:text-white">
-                    {recipe.nutritionPerServing.proteinGrams.toFixed(0)}g
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {L("MealPlannerAPI", "Protein")}
-                  </p>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-white dark:bg-zinc-800/50">
-                  <p className="text-xl font-bold text-zinc-900 dark:text-white">
-                    {recipe.nutritionPerServing.carbsGrams.toFixed(0)}g
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {L("MealPlannerAPI", "Carbs")}
-                  </p>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-white dark:bg-zinc-800/50">
-                  <p className="text-xl font-bold text-zinc-900 dark:text-white">
-                    {recipe.nutritionPerServing.fatGrams.toFixed(0)}g
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {L("MealPlannerAPI", "Fat")}
-                  </p>
-                </div>
-                <div className="text-center p-2 rounded-lg bg-white dark:bg-zinc-800/50 col-span-2 sm:col-span-1">
-                  <p className="text-xl font-bold text-zinc-900 dark:text-white">
-                    {recipe.nutritionPerServing.fiberGrams.toFixed(0)}g
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {L("MealPlannerAPI", "Fiber")}
-                  </p>
-                </div>
+                {[
+                  {
+                    label: L("MealPlannerAPI", "Recipes:Calories"),
+                    value: Math.round(recipe.nutritionPerServing.calories),
+                    unit: "",
+                    color: "text-amber-600 dark:text-amber-400",
+                  },
+                  {
+                    label: L("MealPlannerAPI", "Recipes:Protein"),
+                    value: recipe.nutritionPerServing.proteinGrams.toFixed(0),
+                    unit: "g",
+                    color: "text-blue-600 dark:text-blue-400",
+                  },
+                  {
+                    label: L("MealPlannerAPI", "Recipes:Carbs"),
+                    value: recipe.nutritionPerServing.carbsGrams.toFixed(0),
+                    unit: "g",
+                    color: "text-emerald-600 dark:text-emerald-400",
+                  },
+                  {
+                    label: L("MealPlannerAPI", "Recipes:Fat"),
+                    value: recipe.nutritionPerServing.fatGrams.toFixed(0),
+                    unit: "g",
+                    color: "text-rose-600 dark:text-rose-400",
+                  },
+                  {
+                    label: L("MealPlannerAPI", "Recipes:Fiber"),
+                    value: recipe.nutritionPerServing.fiberGrams.toFixed(0),
+                    unit: "g",
+                    color: "text-violet-600 dark:text-violet-400",
+                  },
+                ].map((n) => (
+                  <div
+                    key={n.label}
+                    className="text-center p-3 rounded-xl bg-card border border-border"
+                  >
+                    <p className={`text-xl font-bold ${n.color}`}>
+                      {n.value}
+                      {n.unit}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {n.label}
+                    </p>
+                  </div>
+                ))}
               </div>
             </section>
           )}
@@ -346,19 +350,25 @@ export default function RecipeDetailPage() {
         {/* Right column: Ingredients and Instructions */}
         <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           {/* Ingredients */}
-          <section className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-              <ListChecks className="w-5 h-5 text-amber-500" />
-              {L("MealPlannerAPI", "Ingredients")}
+          <section className="p-5 rounded-2xl bg-primary-secondary-135 border border-secondary/10 shadow-brand-glow-sm">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground mb-4">
+              <ListChecks
+                className="w-5 h-5 text-secondary"
+                aria-hidden="true"
+              />
+              {L("MealPlannerAPI", "Recipes:Ingredients")}
             </h2>
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {recipe.ingredients?.map((ing) => (
                 <li
                   key={ing.id}
-                  className="flex items-start gap-2 text-zinc-700 dark:text-zinc-300"
+                  className="flex items-start gap-2.5 text-foreground"
                 >
-                  <span className="text-amber-500 mt-0.5">•</span>
-                  <span>
+                  <span
+                    className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0"
+                    aria-hidden="true"
+                  />
+                  <span className="text-sm">
                     {ing.displayQuantity
                       ? `${ing.displayQuantity} ${ing.name}`
                       : ing.quantityGrams > 0
@@ -368,33 +378,36 @@ export default function RecipeDetailPage() {
                 </li>
               ))}
               {(!recipe.ingredients || recipe.ingredients.length === 0) && (
-                <li className="text-zinc-500 dark:text-zinc-400">
-                  {L("MealPlannerAPI", "NoIngredients")}
+                <li className="text-muted-foreground text-sm">
+                  {L("MealPlannerAPI", "Recipes:NoIngredients")}
                 </li>
               )}
             </ul>
           </section>
 
           {/* Instructions */}
-          <section className="p-4 mt-[32] rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-              <UtensilsCrossed className="w-5 h-5 text-amber-500" />
-              {L("MealPlannerAPI", "Instructions")}
+          <section className="p-5 rounded-2xl bg-primary-secondary-225 border border-primary/10 shadow-brand-glow-sm">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground mb-4">
+              <UtensilsCrossed
+                className="w-5 h-5 text-primary"
+                aria-hidden="true"
+              />
+              {L("MealPlannerAPI", "Recipes:Instructions")}
             </h2>
-            <ol className="space-y-2">
+            <ol className="space-y-3">
               {recipe.instructions?.map((step, idx) => (
                 <li key={idx} className="flex gap-3">
-                  <span className="shrink-0 w-7 h-7 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-medium flex items-center justify-center text-sm">
+                  <span className="shrink-0 w-7 h-7 rounded-full bg-brand-gradient text-white font-bold flex items-center justify-center text-xs shadow-brand-glow-sm">
                     {idx + 1}
                   </span>
-                  <span className="text-zinc-700 dark:text-zinc-300 pt-0.5">
+                  <span className="text-sm text-foreground/80 pt-1 leading-relaxed">
                     {step}
                   </span>
                 </li>
               ))}
               {(!recipe.instructions || recipe.instructions.length === 0) && (
-                <li className="text-zinc-500 dark:text-zinc-400">
-                  {L("MealPlannerAPI", "NoInstructions")}
+                <li className="text-muted-foreground text-sm">
+                  {L("MealPlannerAPI", "Recipes:NoInstructions")}
                 </li>
               )}
             </ol>

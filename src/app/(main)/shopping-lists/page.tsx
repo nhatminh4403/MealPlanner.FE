@@ -1,122 +1,101 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { Plus, ShoppingCart, Trash2, Check } from "lucide-react";
+import { Plus, ShoppingCart, Trash2, Check, ShoppingBag } from "lucide-react";
 import { shoppingLists } from "@/libs/api";
 import { ShoppingList } from "@/libs/interfaceDTO";
 import { ShoppingListCategory } from "@/libs/enums";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 
 export default function ShoppingListsPage() {
   const { L } = useLocalization();
   const [userShoppingLists, setUserShoppingLists] = useState<ShoppingList[]>(
     [],
   );
+  const [loading, setLoading] = useState(true);
 
   const loadUserShoppingList = useCallback(async () => {
     try {
-      const shoppingListsRes = await shoppingLists.getList();
-      setUserShoppingLists(shoppingListsRes.data.items);
-      console.log(shoppingListsRes.data.items);
+      const res = await shoppingLists.getList();
+      setUserShoppingLists(res.data.items);
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToLoadShoppingLists"));
+      toast.error(L("MealPlannerAPI", "ShoppingList:LoadFailed"));
+    } finally {
+      setLoading(false);
     }
   }, [L]);
 
   useEffect(() => {
-    (async () => {
-      await loadUserShoppingList();
-    })();
+    loadUserShoppingList();
   }, [loadUserShoppingList]);
 
   const handleToggleItem = async (listId: string, itemId: string) => {
     try {
       await shoppingLists.toggleItem(listId, itemId);
-      loadUserShoppingList();
+      // Optimistic update
+      setUserShoppingLists((prev) =>
+        prev.map((list) =>
+          list.id !== listId
+            ? list
+            : {
+                ...list,
+                items: list.items.map((item) =>
+                  item.id === itemId
+                    ? { ...item, isChecked: !item.isChecked }
+                    : item,
+                ),
+              },
+        ),
+      );
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToUpdateItem"));
+      toast.error(L("MealPlannerAPI", "ShoppingList:UpdateItemFailed"));
     }
   };
 
   const handleDeleteListItem = async (listId: string, itemId: string) => {
     try {
       await shoppingLists.removeItem(listId, itemId);
-      loadUserShoppingList();
+      setUserShoppingLists((prev) =>
+        prev.map((list) =>
+          list.id !== listId
+            ? list
+            : { ...list, items: list.items.filter((i) => i.id !== itemId) },
+        ),
+      );
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToRemoveItem"));
+      toast.error(L("MealPlannerAPI", "ShoppingList:RemoveItemFailed"));
     }
   };
 
   const handleDeleteList = async (listId: string) => {
-    if (!confirm(L("MealPlannerAPI", "ConfirmDeleteList"))) return;
+    if (!confirm(L("MealPlannerAPI", "ShoppingList:ConfirmDelete"))) return;
     try {
       await shoppingLists.delete(listId);
-      loadUserShoppingList();
-      toast.success(L("MealPlannerAPI", "ListDeleted"));
+      setUserShoppingLists((prev) => prev.filter((l) => l.id !== listId));
+      toast.success(L("MealPlannerAPI", "ShoppingList:Deleted"));
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToDeleteList"));
+      toast.error(L("MealPlannerAPI", "ShoppingList:DeleteFailed"));
     }
   };
 
   const handleCreateList = async () => {
-    const name = prompt(L("MealPlannerAPI", "EnterListName"));
+    const name = prompt(L("MealPlannerAPI", "ShoppingList:EnterName"));
     if (!name) return;
     try {
-      await shoppingLists.create({ name });
-      loadUserShoppingList();
-      toast.success(L("MealPlannerAPI", "ListCreated"));
+      const res = await shoppingLists.create({ name });
+      setUserShoppingLists((prev) => [...prev, res.data]);
+      toast.success(L("MealPlannerAPI", "ShoppingList:Created"));
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToCreateList"));
-    }
-  };
-
-  const getCategoryDetails = (category: number) => {
-    switch (category) {
-      case ShoppingListCategory.Produce:
-        return {
-          label: L("MealPlannerAPI", "CategoryProduce"),
-          color:
-            "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
-        };
-      case ShoppingListCategory.Meat:
-        return {
-          label: L("MealPlannerAPI", "CategoryMeat"),
-          color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400",
-        };
-      case ShoppingListCategory.Dairy:
-        return {
-          label: L("MealPlannerAPI", "CategoryDairy"),
-          color:
-            "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
-        };
-      case ShoppingListCategory.Pantry:
-        return {
-          label: L("MealPlannerAPI", "CategoryPantry"),
-          color:
-            "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
-        };
-      case ShoppingListCategory.Frozen:
-        return {
-          label: L("MealPlannerAPI", "CategoryFrozen"),
-          color: "bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400",
-        };
-      default:
-        return {
-          label: L("MealPlannerAPI", "CategoryOther"),
-          color:
-            "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
-        };
+      toast.error(L("MealPlannerAPI", "ShoppingList:CreateFailed"));
     }
   };
 
   const handleAddItem = async (listId: string) => {
-    const itemName = prompt(L("MealPlannerAPI", "ItemName"));
+    const itemName = prompt(L("MealPlannerAPI", "ShoppingList:ItemName"));
     if (!itemName) return;
-    const qty = prompt(L("MealPlannerAPI", "QuantityOptional")) || undefined;
-
-    // We can also let the user pick a category if we had a proper modal
-    // For now, let's keep it simple or default to 'Other'
-
+    const qty =
+      prompt(L("MealPlannerAPI", "ShoppingList:QuantityOptional")) || undefined;
     try {
       await shoppingLists.addItem(listId, {
         name: itemName,
@@ -125,149 +104,268 @@ export default function ShoppingListsPage() {
       });
       loadUserShoppingList();
     } catch {
-      toast.error(L("MealPlannerAPI", "FailedToAddItem"));
+      toast.error(L("MealPlannerAPI", "ShoppingList:AddItemFailed"));
     }
   };
 
+  const getCategoryDetails = (category: number) => {
+    const map: Record<number, { key: string; color: string }> = {
+      [ShoppingListCategory.Produce]: {
+        key: "ShoppingList:CategoryProduce",
+        color:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
+      },
+      [ShoppingListCategory.Meat]: {
+        key: "ShoppingList:CategoryMeat",
+        color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400",
+      },
+      [ShoppingListCategory.Dairy]: {
+        key: "ShoppingList:CategoryDairy",
+        color:
+          "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400",
+      },
+      [ShoppingListCategory.Pantry]: {
+        key: "ShoppingList:CategoryPantry",
+        color:
+          "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+      },
+      [ShoppingListCategory.Frozen]: {
+        key: "ShoppingList:CategoryFrozen",
+        color: "bg-sky-100 text-sky-700 dark:bg-sky-500/10 dark:text-sky-400",
+      },
+    };
+    return (
+      map[category] ?? {
+        key: "ShoppingList:CategoryOther",
+        color: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+      }
+    );
+  };
+
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 pt-24 pb-12 animate-page-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
-            {L("MealPlannerAPI", "ShoppingLists")}
-          </h1>
-          <p className="mt-2 text-zinc-500">
-            {L("MealPlannerAPI", "ShoppingListsDescription")}
-          </p>
-        </div>
-        <button
-          onClick={handleCreateList}
-          className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-        >
-          <Plus size={18} />
-          <span>{L("MealPlannerAPI", "NewList")}</span>
-        </button>
-      </div>
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16 animate-page-in">
+      <AppPageHeader
+        className="mb-10"
+        gradientClassName="bg-primary-secondary-45"
+        icon={ShoppingBag}
+        title={L("MealPlannerAPI", "ShoppingList:Title")}
+        description={L("MealPlannerAPI", "ShoppingList:Description")}
+        actions={
+          <button
+            onClick={handleCreateList}
+            className="flex items-center gap-2 bg-brand-gradient text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-brand-glow-sm hover:shadow-brand-glow active:scale-[0.98]"
+          >
+            <Plus size={18} aria-hidden="true" />
+            {L("MealPlannerAPI", "ShoppingList:NewList")}
+          </button>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {userShoppingLists.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl bg-white/30 dark:bg-zinc-900/30 backdrop-blur-sm col-span-full py-20">
-            <div className="w-20 h-20 mb-6 rounded-3xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-inner">
-              <ShoppingCart size={40} />
-            </div>
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-              {L("MealPlannerAPI", "NoShoppingLists")}
-            </h3>
-            <p className="text-zinc-500 max-w-xs mb-8">
-              {L("MealPlannerAPI", "NoShoppingListsDescription")}
-            </p>
-            <button
-              onClick={handleCreateList}
-              className="text-emerald-500 font-medium hover:underline flex items-center gap-2"
-            >
-              <Plus size={16} /> {L("MealPlannerAPI", "CreateFirstList")}
-            </button>
-          </div>
-        ) : (
-          userShoppingLists.map((list) => (
+      {/* Loading skeleton */}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
             <div
-              key={list.id}
-              className="group relative bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-lg hover:shadow-2xl hover:bg-white/80 dark:hover:bg-zinc-900/80 transition-all duration-300 flex flex-col h-full"
+              key={i}
+              className="rounded-3xl border border-border bg-card p-6 space-y-4 animate-pulse"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-emerald-500 transition-colors uppercase tracking-wider text-sm">
-                  {list.name}
-                </h3>
-                <button
-                  onClick={() => handleDeleteList(list.id)}
-                  className="p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-xl bg-zinc-100/50 dark:bg-zinc-800/50 hover:bg-red-50 dark:hover:bg-red-500/10"
-                  title={L("MealPlannerAPI", "DeleteList")}
-                >
-                  <Trash2 size={14} />
-                </button>
+              <div className="h-5 w-1/2 bg-muted rounded-lg" />
+              <div className="space-y-2">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="h-10 bg-muted rounded-xl" />
+                ))}
               </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-              <div className="space-y-3 grow">
-                {list.items.length === 0 ? (
-                  <p className="text-sm text-zinc-400 italic py-4">
-                    {L("MealPlannerAPI", "NoItemsInList")}
-                  </p>
-                ) : (
-                  list.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className={`flex items-center justify-between group/item p-3 rounded-2xl transition-all ${
-                        item.isChecked
-                          ? "bg-emerald-50/30 dark:bg-emerald-500/5 opacity-60"
-                          : "hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50"
-                      }`}
+      {/* Empty state */}
+      {!loading && userShoppingLists.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-3xl border-2 border-dashed border-border bg-primary-secondary-radial-center">
+          <div className="w-20 h-20 mb-6 rounded-3xl bg-primary/10 flex items-center justify-center shadow-brand-glow-sm">
+            <ShoppingCart
+              size={36}
+              className="text-primary"
+              aria-hidden="true"
+            />
+          </div>
+          <h3 className="text-xl font-bold text-foreground mb-2">
+            {L("MealPlannerAPI", "ShoppingList:NoLists")}
+          </h3>
+          <p className="text-muted-foreground max-w-xs mb-8">
+            {L("MealPlannerAPI", "ShoppingList:NoListsDesc")}
+          </p>
+          <button
+            onClick={handleCreateList}
+            className="flex items-center gap-2 text-primary font-semibold hover:underline"
+          >
+            <Plus size={16} aria-hidden="true" />
+            {L("MealPlannerAPI", "ShoppingList:CreateFirst")}
+          </button>
+        </div>
+      )}
+
+      {/* Lists grid */}
+      {!loading && userShoppingLists.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {userShoppingLists.map((list, idx) => {
+            const checkedCount = list.items.filter((i) => i.isChecked).length;
+            const progress =
+              list.items.length > 0
+                ? (checkedCount / list.items.length) * 100
+                : 0;
+            const gradients = [
+              "bg-primary-secondary-25",
+              "bg-primary-secondary-135",
+              "bg-primary-secondary-270",
+            ];
+
+            return (
+              <div
+                key={list.id}
+                className="group relative rounded-3xl border border-border bg-card shadow-sm hover:shadow-brand-glow transition-all duration-300 flex flex-col h-full overflow-hidden"
+              >
+                {/* Top accent bar using different gradient angles */}
+                <div
+                  className={`h-1 w-full ${gradients[idx % gradients.length]}`}
+                />
+
+                <div className="p-6 flex flex-col flex-1">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-foreground group-hover:text-primary transition-colors uppercase tracking-wider text-sm truncate pr-2">
+                      {list.name}
+                    </h3>
+                    <button
+                      onClick={() => handleDeleteList(list.id)}
+                      className="p-2 text-muted-foreground hover:text-destructive transition-colors rounded-xl hover:bg-destructive/10 shrink-0"
+                      aria-label={L(
+                        "MealPlannerAPI",
+                        "ShoppingList:DeleteList",
+                      )}
                     >
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <button
-                          onClick={() => handleToggleItem(list.id, item.id)}
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
-                            item.isChecked
-                              ? "bg-emerald-500 border-emerald-500 text-white"
-                              : "border-zinc-300 dark:border-zinc-600"
-                          }`}
-                        >
-                          {item.isChecked && <Check size={12} />}
-                        </button>
-                        <div className="flex flex-col overflow-hidden">
-                          <span
-                            className={`text-sm font-medium transition-all group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 ${
+                      <Trash2 size={14} aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  {/* Progress bar */}
+                  {list.items.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+                        <span>
+                          {checkedCount} {L("MealPlannerAPI", "Common:Of")}{" "}
+                          {list.items.length}{" "}
+                          {L("MealPlannerAPI", "Common:Completed")}
+                        </span>
+                        <span className="font-semibold text-primary">
+                          {Math.round(progress)}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full bg-brand-gradient rounded-full transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Items */}
+                  <div className="space-y-2 flex-1">
+                    {list.items.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic py-4 text-center">
+                        {L("MealPlannerAPI", "ShoppingList:NoItems")}
+                      </p>
+                    ) : (
+                      list.items.map((item) => {
+                        const cat = getCategoryDetails(item.category);
+                        return (
+                          <div
+                            key={item.id}
+                            className={`group/item flex items-center justify-between p-2.5 rounded-xl transition-all ${
                               item.isChecked
-                                ? "text-zinc-400 line-through decoration-emerald-500/50"
-                                : "text-zinc-700 dark:text-zinc-100"
+                                ? "opacity-50"
+                                : "hover:bg-muted/50"
                             }`}
                           >
-                            {item.name}
-                          </span>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {item.quantity && (
-                              <span
-                                className="text-[13px] text-zinc-500 font-medium px-1.5 py-0.5 rounded-md bg-zinc-100
-                               dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <button
+                                onClick={() =>
+                                  handleToggleItem(list.id, item.id)
+                                }
+                                className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0 ${
+                                  item.isChecked
+                                    ? "bg-primary border-primary text-primary-foreground"
+                                    : "border-border hover:border-primary"
+                                }`}
+                                aria-label={
+                                  item.isChecked ? "Uncheck item" : "Check item"
+                                }
                               >
-                                {item.quantity} {item.unit}
-                              </span>
-                            )}
-                            <span
-                              className={`text-[13px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${getCategoryDetails(item.category).color}`}
+                                {item.isChecked && (
+                                  <Check size={11} aria-hidden="true" />
+                                )}
+                              </button>
+                              <div className="flex flex-col overflow-hidden">
+                                <span
+                                  className={`text-sm font-medium truncate ${
+                                    item.isChecked
+                                      ? "line-through text-muted-foreground"
+                                      : "text-foreground"
+                                  }`}
+                                >
+                                  {item.name}
+                                </span>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  {item.quantity && (
+                                    <span className="text-[11px] text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted border border-border">
+                                      {item.quantity} {item.unit}
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${cat.color}`}
+                                  >
+                                    {L("MealPlannerAPI", cat.key)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleDeleteListItem(list.id, item.id)
+                              }
+                              className="opacity-0 group-hover/item:opacity-100 p-1.5 text-muted-foreground hover:text-destructive transition-all rounded-lg hover:bg-destructive/10 shrink-0"
+                              aria-label="Remove item"
                             >
-                              {getCategoryDetails(item.category).label}
-                            </span>
+                              <Plus
+                                size={13}
+                                className="rotate-45"
+                                aria-hidden="true"
+                              />
+                            </button>
                           </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteListItem(list.id, item.id)}
-                        className="opacity-0 group-hover/item:opacity-100 p-1.5 text-zinc-400 hover:text-red-500 transition-all rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10"
-                      >
-                        <Plus size={14} className="rotate-45" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
+                        );
+                      })
+                    )}
+                  </div>
 
-              <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                <span className="text-[10px] text-zinc-400 font-medium">
-                  {list.items.filter((i) => i.isChecked).length}{" "}
-                  {L("MealPlannerAPI", "Of")} {list.items.length}{" "}
-                  {L("MealPlannerAPI", "Completed")}
-                </span>
-                <button
-                  className="text-xs font-semibold text-emerald-500 hover:text-emerald-600 transition-colors flex items-center gap-1"
-                  onClick={() => handleAddItem(list.id)}
-                >
-                  <Plus size={12} /> {L("MealPlannerAPI", "AddItem")}
-                </button>
+                  {/* Footer */}
+                  <div className="mt-4 pt-4 border-t border-border flex items-center justify-end">
+                    <button
+                      className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                      onClick={() => handleAddItem(list.id)}
+                    >
+                      <Plus size={12} aria-hidden="true" />
+                      {L("MealPlannerAPI", "ShoppingList:AddItem")}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

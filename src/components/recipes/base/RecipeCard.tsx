@@ -2,15 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Clock, ChefHat } from "lucide-react";
+import { Star, Clock, ChefHat, Users, Flame } from "lucide-react";
 import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLocalization } from "@/libs/LocalizationProvider";
 
-const DIFFICULTY_LABELS: Record<number, string> = {
-  0: "Easy",
-  1: "Medium",
-  2: "Hard",
+const DIFFICULTY_LABEL_KEYS: Record<number, string> = {
+  0: "Unit:Easy",
+  1: "Unit:Medium",
+  2: "Unit:Hard",
+};
+
+const DIFFICULTY_COLORS: Record<number, string> = {
+  0: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800",
+  1: "text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950 dark:border-amber-800",
+  2: "text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800",
 };
 
 const PLACEHOLDER_IMAGE =
@@ -25,83 +31,112 @@ export default function RecipeCard({
   recipe,
   variant = "default",
 }: RecipeCardProps) {
+  const { L } = useLocalization();
   const isTrending = "trendingScore" in recipe && "trendingSince" in recipe;
   const summary = "totalTimeMinutes" in recipe ? recipe : null;
 
   return (
-    <Link href={`/recipe/${recipe.id}`}>
-      <Card className="group overflow-hidden h-full transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:ring-2 hover:ring-amber-500/30 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 pt-0">
-        <div className="relative aspect-4/3  w-full bg-zinc-100 dark:bg-zinc-800">
+    <Link
+      href={`/recipe/${recipe.id}`}
+      className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-2xl block h-full"
+    >
+      <article className="relative overflow-hidden rounded-2xl border border-border bg-card h-full flex flex-col transition-all duration-300 group-hover:shadow-brand-glow group-hover:-translate-y-0.5 group-hover:border-primary/30">
+        {/* Image */}
+        <div className="relative aspect-4/3 w-full overflow-hidden bg-muted shrink-0">
           <Image
             src={recipe.imageUrl || PLACEHOLDER_IMAGE}
             alt={recipe.name}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             unoptimized={!recipe.imageUrl}
           />
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+
+          {/* Trending badge */}
           {isTrending && (
-            <div className="absolute top-2 right-2">
-              <Badge className="bg-amber-500/90 text-white border-0 font-medium">
-                🔥 Trending
-              </Badge>
+            <div className="absolute top-2.5 left-2.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-white shadow">
+                <Flame className="w-3 h-3" aria-hidden="true" />
+                {L("MealPlannerAPI", "Recipes:TrendingLabel")}
+              </span>
             </div>
           )}
-          <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-3">
-            <div className="flex items-center gap-2 text-white/90 text-sm">
-              <span className="flex items-center gap-1">
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                {recipe.rating?.toFixed(1) ?? "—"}
-              </span>
-              <span>•</span>
-              <span>{recipe.reviewCount ?? 0} reviews</span>
-              {isTrending && "trendingSince" in recipe && (
-                <>
-                  <span>•</span>
-                  <span className="text-white/80">{recipe.trendingSince}</span>
-                </>
-              )}
-            </div>
+
+          {/* Rating pill — bottom left */}
+          <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-black/50 backdrop-blur-sm px-2.5 py-1">
+            <Star
+              className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0"
+              aria-hidden="true"
+            />
+            <span className="text-xs font-bold text-white tabular-nums">
+              {recipe.rating?.toFixed(1) ?? "—"}
+            </span>
+            <span className="text-[10px] text-white/70">
+              ({recipe.reviewCount ?? 0})
+            </span>
           </div>
         </div>
-        <CardHeader className="pb-2">
-          <h3 className="font-semibold text-lg text-zinc-900 dark:text-white line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+
+        {/* Body */}
+        <div className="flex flex-col flex-1 p-4 gap-2">
+          {/* Title */}
+          <h3 className="font-bold text-base text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors">
             {recipe.name}
           </h3>
+
+          {/* Badges row */}
           {summary && (
-            <div className="flex flex-wrap gap-1.5 mt-1">
-              <Badge variant="secondary" className="text-xs font-normal">
-                {summary.cuisine}
-              </Badge>
-              {summary.difficulty !== undefined && (
-                <Badge variant="outline" className="text-xs font-normal">
-                  <ChefHat className="w-3 h-3 mr-0.5" />
-                  {DIFFICULTY_LABELS[summary.difficulty] ?? "—"}
+            <div className="flex flex-wrap gap-1.5">
+              {summary.cuisine && (
+                <Badge
+                  variant="secondary"
+                  className="text-[11px] font-medium px-2 py-0.5"
+                >
+                  {summary.cuisine}
                 </Badge>
+              )}
+              {summary.difficulty !== undefined && (
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${DIFFICULTY_COLORS[summary.difficulty] ?? ""}`}
+                >
+                  <ChefHat className="w-3 h-3" aria-hidden="true" />
+                  {L(
+                    "MealPlannerAPI",
+                    DIFFICULTY_LABEL_KEYS[summary.difficulty] ?? "Unit:Easy",
+                  )}
+                </span>
               )}
             </div>
           )}
-        </CardHeader>
-        {variant !== "compact" &&
-          "description" in recipe &&
-          recipe.description && (
-            <CardContent className="pt-0">
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+
+          {/* Description */}
+          {variant !== "compact" &&
+            "description" in recipe &&
+            recipe.description && (
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">
                 {recipe.description}
               </p>
-              {summary && (
-                <div className="flex items-center gap-2 mt-3 text-xs text-zinc-400 dark:text-zinc-500">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {summary.totalTimeMinutes} min
-                  </span>
-                  <span>•</span>
-                  <span>{summary.servings} servings</span>
-                </div>
-              )}
-            </CardContent>
+            )}
+
+          {/* Footer meta */}
+          {summary && (
+            <div className="flex items-center gap-3 pt-1 mt-auto text-xs text-muted-foreground border-t border-border/60">
+              <span className="flex items-center gap-1 pt-2">
+                <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                {summary.totalTimeMinutes}{" "}
+                {L("MealPlannerAPI", "Recipes:MinShort")}
+              </span>
+              <span className="flex items-center gap-1 pt-2">
+                <Users className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                {summary.servings} {L("MealPlannerAPI", "Recipes:Servings")}
+              </span>
+            </div>
           )}
-      </Card>
+        </div>
+      </article>
     </Link>
   );
 }

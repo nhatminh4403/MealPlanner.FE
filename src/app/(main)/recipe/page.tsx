@@ -20,7 +20,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 
 const PAGE_SIZE = 10;
 
@@ -147,29 +147,41 @@ export default function RecipePage() {
 
   return (
     <div className="w-full max-w-480 mx-auto px-6 lg:px-12 2xl:px-20 pt-24 pb-16 flex flex-col gap-12 animate-page-in">
-      {/* Search Header - Stationary */}
+      {/* Search Header */}
       <div className="shrink-0">
-        <h1 className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">
-          {L("MealPlannerAPI", "BrowseRecipes")}
-        </h1>
-        <form onSubmit={handleSearch} className="mt-6 flex gap-3 max-w-2xl">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <Input
-              placeholder={L("MealPlannerAPI", "SearchRecipesPlaceholder")}
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10 h-11 border-black/50 dark:border-input"
-            />
+        <div className="relative overflow-hidden rounded-3xl bg-primary-secondary-180 shadow-brand-glow-sm mb-8 p-8 sm:p-10">
+          <div className="gradient-border-static absolute inset-0 rounded-3xl pointer-events-none" />
+          <LayoutGrid
+            className="absolute -right-6 -bottom-6 w-40 h-40 opacity-[0.05] dark:opacity-[0.04] pointer-events-none"
+            aria-hidden="true"
+          />
+          <div className="relative z-10">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gradient-brand mb-6">
+              {L("MealPlannerAPI", "Recipes:Browse")}
+            </h1>
+            <form onSubmit={handleSearch} className="flex gap-3 max-w-2xl">
+              <div className="relative flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <Input
+                  placeholder={L("MealPlannerAPI", "Recipes:SearchPlaceholder")}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-10 h-11 border-border/80"
+                />
+              </div>
+              <Button
+                type="submit"
+                size="lg"
+                className="px-8 transition-all active:scale-95 bg-brand-gradient border-0 text-white hover:opacity-90"
+              >
+                {L("MealPlannerAPI", "Common:Search")}
+              </Button>
+            </form>
           </div>
-          <Button
-            type="submit"
-            size="lg"
-            className="px-8 transition-all active:scale-95"
-          >
-            {L("MealPlannerAPI", "Search")}
-          </Button>
-        </form>
+        </div>
       </div>
 
       <div className="flex flex-col gap-8">
@@ -178,17 +190,17 @@ export default function RecipePage() {
           <section className="flex flex-col">
             <div className="flex items-center justify-between  gap-3 mb-4 shrink-0 px-1">
               <div className="flex items-center gap-3 p-1.5 rounded-lg bg-primary/10 text-primary">
-                <User className="w-5 h-5" />
-                <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-                  {L("MealPlannerAPI", "MyCreations")}
+                <User className="w-5 h-5" aria-hidden="true" />
+                <h2 className="text-xl font-bold text-foreground">
+                  {L("MealPlannerAPI", "Recipes:MyCreations")}
                 </h2>
               </div>
 
               <Button
                 onClick={() => router.push("/recipe/add")}
-                className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 bg-brand-gradient text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-brand-glow-sm hover:shadow-brand-glow active:scale-[0.98] border-0 hover:opacity-90"
               >
-                {L("MealPlannerAPI", "AddRecipe")}
+                {L("MealPlannerAPI", "Recipes:Add")}
               </Button>
             </div>
             <div className="pr-2 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/20 p-4">
@@ -202,7 +214,7 @@ export default function RecipePage() {
                   {userRecipes.length === 0 && (
                     <div className="col-span-full py-12 text-center">
                       <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-                        {L("MealPlannerAPI", "NoUserRecipes")}
+                        {L("MealPlannerAPI", "Recipes:NoUserRecipes")}
                       </p>
                     </div>
                   )}
@@ -217,16 +229,19 @@ export default function RecipePage() {
           <div className="flex items-center justify-between mb-4 shrink-0 px-1">
             <div className="flex items-center gap-3">
               <div className="p-1.5 rounded-lg bg-secondary/10 text-secondary">
-                <LayoutGrid className="w-5 h-5" />
+                <LayoutGrid className="w-5 h-5" aria-hidden="true" />
               </div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+              <h2 className="text-xl font-bold text-foreground">
                 {searchTerm
-                  ? L("MealPlannerAPI", "ResultsFor").replace("{0}", searchTerm)
-                  : L("MealPlannerAPI", "AllRecipes")}
+                  ? L("MealPlannerAPI", "Recipes:ResultsFor").replace(
+                      "{0}",
+                      searchTerm,
+                    )
+                  : L("MealPlannerAPI", "Recipes:All")}
               </h2>
             </div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-              {L("MealPlannerAPI", "Found").replace(
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {L("MealPlannerAPI", "Recipes:Found").replace(
                 "{0}",
                 allRecipesTotal.toString(),
               )}

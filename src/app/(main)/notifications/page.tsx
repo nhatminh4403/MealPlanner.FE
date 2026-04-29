@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { notifications } from "@/libs/api";
 import { UserNotification } from "@/libs/interfaceDTO";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { formatDistanceToNow } from "date-fns";
 import {
   Inbox,
@@ -20,7 +20,8 @@ import { toast } from "sonner";
 import { useNotifications } from "@/libs/NotificationProvider";
 import { isAuthenticated } from "@/libs/axios";
 import { useRouter } from "next/navigation";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
+import { AppPageHeader } from "@/components/layout/AppPageHeader";
 
 const TYPE_CONFIG: Record<
   string,
@@ -75,7 +76,7 @@ export default function NotificationsPage() {
       setItems(res.data.items);
     } catch (error) {
       console.error("Failed to fetch notifications", error);
-      toast.error(L("MealPlannerAPI", "FailedToLoadNotifications"));
+      toast.error(L("MealPlannerAPI", "Notifications:FailedToLoad"));
     } finally {
       setLoading(false);
     }
@@ -93,7 +94,7 @@ export default function NotificationsPage() {
       // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as read", error);
-      toast.error(L("MealPlannerAPI", "FailedToMarkAsRead"));
+      toast.error(L("MealPlannerAPI", "Notifications:FailedToMarkAsRead"));
     }
   };
 
@@ -106,7 +107,7 @@ export default function NotificationsPage() {
       // notifyChanges();
     } catch (error) {
       console.error("Failed to mark as unread", error);
-      toast.error(L("MealPlannerAPI", "FailedToMarkAsUnread"));
+      toast.error(L("MealPlannerAPI", "Notifications:FailedToMarkAsUnread"));
     }
   };
 
@@ -119,10 +120,10 @@ export default function NotificationsPage() {
       if (itemToDelete && !itemToDelete.isRead) {
         // notifyChanges();
       }
-      toast.success(L("MealPlannerAPI", "NotificationDeleted"));
+      toast.success(L("MealPlannerAPI", "Notifications:Deleted"));
     } catch (error) {
       console.error("Failed to delete notification", error);
-      toast.error(L("MealPlannerAPI", "FailedToDeleteNotification"));
+      toast.error(L("MealPlannerAPI", "Notifications:FailedToDelete"));
     }
   };
 
@@ -147,7 +148,7 @@ export default function NotificationsPage() {
     const item = items.find((i) => i.id === id);
     if (item && !item.isRead) {
       await handleMarkAsRead(id);
-      toast.success(L("MealPlannerAPI", "MarkedAsRead"));
+      toast.success(L("MealPlannerAPI", "Notifications:MarkedAsRead"));
     }
     setDraggedId(null);
   };
@@ -159,7 +160,7 @@ export default function NotificationsPage() {
     const item = items.find((i) => i.id === id);
     if (item && item.isRead) {
       await handleMarkAsUnread(id);
-      toast.success(L("MealPlannerAPI", "MovedBackToUnread"));
+      toast.success(L("MealPlannerAPI", "Notifications:MovedBackToUnread"));
     }
     setDraggedId(null);
   };
@@ -169,17 +170,13 @@ export default function NotificationsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col px-6 pt-24 pb-8 h-[calc(100vh-2rem)]">
-      <div className="mb-6 flex items-end justify-between">
-        <div>
-          <h1 className="flex items-center gap-3 text-3xl font-bold text-zinc-900 dark:text-white">
-            <Bell className="h-8 w-8 text-primary" />
-            {L("MealPlannerAPI", "Inbox")}
-          </h1>
-          <p className="mt-1 text-zinc-500">
-            {L("MealPlannerAPI", "NotificationsDescription")}
-          </p>
-        </div>
-      </div>
+      <AppPageHeader
+        className="mb-6"
+        gradientClassName="bg-primary-secondary-65"
+        icon={Bell}
+        title={L("MealPlannerAPI", "Notifications:Inbox")}
+        description={L("MealPlannerAPI", "Notifications:Description")}
+      />
 
       <div className="grid h-full flex-1 grid-cols-1 gap-6 overflow-hidden md:grid-cols-2">
         {/* UNREAD CONTAINER (Drop target for Read items) */}
@@ -194,8 +191,8 @@ export default function NotificationsPage() {
           )}
         >
           <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-              {L("MealPlannerAPI", "Unread")}
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              {L("MealPlannerAPI", "Notifications:Unread")}
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-white">
                 {unreadCount}
               </span>
@@ -210,8 +207,8 @@ export default function NotificationsPage() {
             ) : unreadItems.length === 0 ? (
               <div className="flex h-60 flex-col items-center justify-center p-8 text-center">
                 <Inbox className="mb-4 h-12 w-12 text-zinc-200 dark:text-zinc-800" />
-                <p className="text-sm font-medium text-zinc-400">
-                  {L("MealPlannerAPI", "AllCaughtUp")}
+                <p className="text-sm font-medium text-muted-foreground">
+                  {L("MealPlannerAPI", "Notifications:AllCaughtUp")}
                 </p>
               </div>
             ) : (
@@ -282,11 +279,11 @@ export default function NotificationsPage() {
           )}
         >
           <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
-              {L("MealPlannerAPI", "RecentActivity")}
+            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+              {L("MealPlannerAPI", "Notifications:RecentActivity")}
             </h2>
-            <span className="text-[10px] font-medium text-zinc-400">
-              {L("MealPlannerAPI", "ItemsCount").replace(
+            <span className="text-[10px] font-medium text-muted-foreground">
+              {L("MealPlannerAPI", "Notifications:ItemsCount").replace(
                 "{0}",
                 readItems.length.toString(),
               )}
@@ -299,8 +296,8 @@ export default function NotificationsPage() {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-50 dark:bg-zinc-900">
                   <Bell className="h-8 w-8 text-zinc-200 dark:text-zinc-800" />
                 </div>
-                <p className="max-w-50 text-xs leading-relaxed text-zinc-400 italic">
-                  {L("MealPlannerAPI", "NoRecentActivity")}
+                <p className="max-w-50 text-xs leading-relaxed text-muted-foreground italic">
+                  {L("MealPlannerAPI", "Notifications:NoRecentActivity")}
                 </p>
               </div>
             ) : (

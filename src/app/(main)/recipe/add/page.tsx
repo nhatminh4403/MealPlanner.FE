@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { recipes } from "@/libs/api";
 import { CreateRecipeDto } from "@/libs/interfaceDTO";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
@@ -77,9 +77,10 @@ export default function AddRecipePage() {
       form.tags.filter((t) => t !== tag),
     );
 
-const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
-    setIngredients((prev) =>
-      prev.map((r) => (r.key === key ? resolveRow({ ...r, ...patch }) : r)), // <--- ADD resolveRow(...) here
+  const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
+    setIngredients(
+      (prev) =>
+        prev.map((r) => (r.key === key ? resolveRow({ ...r, ...patch }) : r)), // <--- ADD resolveRow(...) here
     );
 
   const addIngredient = () =>
@@ -155,7 +156,7 @@ const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
       const response = await recipes.create(payload);
       toast.success(
         L("MealPlannerAPI", "RecipeCreatedSuccessfully") ||
-        "Recipe created successfully!",
+          "Recipe created successfully!",
       );
       router.push(`/recipe/${response.data.id}`);
       setForm(emptyForm());
@@ -163,13 +164,13 @@ const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
       if (axios.isAxiosError(err)) {
         toast.error(
           err.response?.data?.error?.message ??
-          L("MealPlannerAPI", "FailToAddRecipe") ??
-          "Failed to add recipe",
+            L("MealPlannerAPI", "FailToAddRecipe") ??
+            "Failed to add recipe",
         );
       } else {
         toast.error(
           L("AbpUi", "UnexpectedErrorOccurred") ??
-          "An unexpected error occurred",
+            "An unexpected error occurred",
         );
       }
     } finally {
@@ -179,7 +180,7 @@ const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
 
   return (
     <div className="relative w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in bg-gradient-mesh overflow-hidden">
-      <RecipeHeader >
+      <RecipeHeader>
         <div className="flex justify-end gap-3 pb-12">
           <Button
             variant="outline"
@@ -234,7 +235,6 @@ const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
               removeInstruction={removeInstruction}
               updateInstruction={updateInstruction}
             />
-
           </div>
         </div>
       </div>

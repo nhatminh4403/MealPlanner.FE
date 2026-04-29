@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 
 interface DensitySelectorProps {
   value: number;
@@ -52,9 +52,7 @@ export function DensitySelector({ value, onChange }: DensitySelectorProps) {
               )}
             >
               <span>{p.label}</span>
-              <span className="ml-2 text(--muted-fg)">
-                {p.density} g/ml
-              </span>
+              <span className="ml-2 text(--muted-fg)">{p.density} g/ml</span>
             </SelectItem>
           ))}
         </SelectContent>

@@ -10,16 +10,22 @@ import { userProfiles } from "@/libs/api";
 import { UserProfile } from "@/libs/interfaceDTO";
 import { useTheme } from "@/libs/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
+import { useLocalization } from "@/libs/LocalizationProvider";
 
-const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/recipe", label: "Recipes" },
-  { href: "/meal-plans", label: "Meal Plans", requiresAuth: true },
-  { href: "/shopping-lists", label: "Shopping Lists", requiresAuth: true },
+const NAV_LINK_DEFS = [
+  { href: "/", labelKey: "Menu:Home" },
+  { href: "/recipe", labelKey: "Menu:Recipes" },
+  { href: "/meal-plans", labelKey: "Menu:MealPlans", requiresAuth: true },
+  {
+    href: "/shopping-lists",
+    labelKey: "Menu:ShoppingLists",
+    requiresAuth: true,
+  },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  const { L } = useLocalization();
 
   const { theme, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -48,7 +54,8 @@ export default function Header() {
         })
         .catch((err) => {
           console.error("Failed to fetch user profile:", err);
-          // Don't set state to avoid "Null?" UI if possible, or handle it as a fallback
+          // Don't set state to avoid "Null?" UI if possible,
+          // or handle it as a fallback
         });
     }
   }, [isLoggedIn]);
@@ -99,38 +106,40 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden h-full items-center space-x-1 md:flex">
-            {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
-              (link) => {
-                const isActive =
-                  pathname === link.href ||
-                  (pathname?.startsWith(link.href) && link.href !== "/");
+            {NAV_LINK_DEFS.filter(
+              (link) => !link.requiresAuth || isLoggedIn,
+            ).map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (pathname?.startsWith(link.href) && link.href !== "/");
 
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => {
-                      if (pathname !== link.href) setIsNavigating(true);
-                    }}
-                    className={`group relative flex h-full items-center px-4 text-sm
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => {
+                    if (pathname !== link.href) setIsNavigating(true);
+                  }}
+                  className={`group relative flex h-full items-center px-4 text-sm
                      font-semibold transition-all duration-300 ${
                        isActive
                          ? "text-zinc-900 bg-active-gradient dark:text-white"
                          : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-white dark:hover:bg-zinc-900/40"
                      }`}
-                  >
-                    {!isActive && (
-                      <div className="gradient-border-persistent group-hover:opacity-10" />
-                    )}
-                    <span className="relative z-10">{link.label}</span>
-                    {/* Active Indicator */}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 h-0.5 w-full bg-linear-to-r from-primary to-secondary shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
-                    )}
-                  </Link>
-                );
-              },
-            )}
+                >
+                  {!isActive && (
+                    <div className="gradient-border-persistent group-hover:opacity-10" />
+                  )}
+                  <span className="relative z-10">
+                    {L("MealPlannerAPI", link.labelKey)}
+                  </span>
+                  {/* Active Indicator */}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 h-0.5 w-full bg-linear-to-r from-primary to-secondary shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right Side Actions */}
@@ -220,7 +229,7 @@ export default function Header() {
                           className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          Settings
+                          {L("MealPlannerAPI", "User:Settings")}
                         </Link>
                       </div>
                       <div className="border-t border-zinc-100 py-1 dark:border-zinc-800">
@@ -232,7 +241,7 @@ export default function Header() {
                             window.location.href = "/";
                           }}
                         >
-                          Sign out
+                          {L("MealPlannerAPI", "User:SignOut")}
                         </button>
                       </div>
                     </>
@@ -243,14 +252,14 @@ export default function Header() {
                         className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        Sign in
+                        {L("MealPlannerAPI", "User:SignIn")}
                       </Link>
                       <Link
                         href="/register"
                         className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        Register
+                        {L("MealPlannerAPI", "User:Register")}
                       </Link>
                     </div>
                   )}
@@ -316,34 +325,36 @@ export default function Header() {
           <div className="absolute top-16 left-0 right-0 border-b border-zinc-200 bg-white/95 backdrop-blur-md shadow-xl transition-colors duration-300 dark:border-zinc-800 dark:bg-zinc-950/95">
             {/* Nav Links */}
             <nav className="flex flex-col px-4 py-3">
-              {NAV_LINKS.filter((link) => !link.requiresAuth || isLoggedIn).map(
-                (link) => {
-                  const isActive =
-                    pathname === link.href ||
-                    (pathname?.startsWith(link.href) && link.href !== "/");
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => {
-                        if (pathname !== link.href) setIsNavigating(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
-                        isActive
-                          ? "bg-active-gradient text-zinc-900 dark:text-white"
-                          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                      }`}
-                    >
-                      {/* Active left bar */}
-                      {isActive && (
-                        <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-linear-to-b from-primary to-secondary" />
-                      )}
-                      <span className="pl-2">{link.label}</span>
-                    </Link>
-                  );
-                },
-              )}
+              {NAV_LINK_DEFS.filter(
+                (link) => !link.requiresAuth || isLoggedIn,
+              ).map((link) => {
+                const isActive =
+                  pathname === link.href ||
+                  (pathname?.startsWith(link.href) && link.href !== "/");
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => {
+                      if (pathname !== link.href) setIsNavigating(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
+                      isActive
+                        ? "bg-active-gradient text-zinc-900 dark:text-white"
+                        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                    }`}
+                  >
+                    {/* Active left bar */}
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-linear-to-b from-primary to-secondary" />
+                    )}
+                    <span className="pl-2">
+                      {L("MealPlannerAPI", link.labelKey)}
+                    </span>
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Divider */}
@@ -399,14 +410,14 @@ export default function Header() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex-1 rounded-xl bg-zinc-100 py-2.5 text-center text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800"
                 >
-                  Sign in
+                  {L("MealPlannerAPI", "User:SignIn")}
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex-1 rounded-xl bg-linear-to-r from-primary to-secondary py-2.5 text-center text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
                 >
-                  Register
+                  {L("MealPlannerAPI", "User:Register")}
                 </Link>
               </div>
             )}

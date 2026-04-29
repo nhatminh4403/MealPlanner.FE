@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# kiro
+/.kiro/
+
 # production
 /build
 
@@ -40,3 +43,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.kiro/specs/homepage-redesign/.config.kiro
+.kiro/specs/homepage-redesign/design.md
+.kiro/specs/homepage-redesign/tasks.md
+.kiro/specs/homepage-redesign/requirements.md
+src/components/home/__tests__/homepage.test.tsx
+vitest.setup.ts
+.gitignore
+vitest.config.ts

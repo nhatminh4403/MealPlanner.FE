@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Card,

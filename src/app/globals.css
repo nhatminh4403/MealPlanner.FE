@@ -155,6 +155,20 @@ body {
     radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.1) 0px, transparent 60%);
 }
 
+.bg-gradient-sheen {
+  background:
+    linear-gradient(28deg, color-mix(in srgb, var(--primary) 18%, transparent), transparent 46%),
+    linear-gradient(148deg, color-mix(in srgb, var(--secondary) 20%, transparent), transparent 42%),
+    linear-gradient(228deg, color-mix(in srgb, var(--primary) 14%, transparent), transparent 50%);
+}
+
+.text-gradient-brand {
+  background: linear-gradient(118deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 .gradient-border {
   position: relative;
   background-clip: padding-box;
@@ -209,7 +223,6 @@ body {
   opacity: 0.8;
 }
 
-/* Specific class for persistent borders where we toggle opacity */
 .gradient-border-persistent {
   position: absolute;
   inset: 0;
@@ -250,6 +263,100 @@ body {
   );
 }
 @layer utilities {
+  /* ── Angled brand gradients (primary → secondary) ─────────────────── */
+  .bg-primary-secondary-25 {
+    background: linear-gradient(25deg, color-mix(in srgb, var(--primary) 24%, transparent), color-mix(in srgb, var(--secondary) 22%, transparent));
+  }
+  .bg-primary-secondary-45 {
+    background: linear-gradient(45deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+  .bg-primary-secondary-65 {
+    background: linear-gradient(65deg, color-mix(in srgb, var(--primary) 24%, transparent), color-mix(in srgb, var(--secondary) 22%, transparent));
+  }
+  .bg-primary-secondary-90 {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 20%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+  .bg-primary-secondary-115 {
+    background: linear-gradient(115deg, color-mix(in srgb, var(--primary) 24%, transparent), color-mix(in srgb, var(--secondary) 22%, transparent));
+  }
+  .bg-primary-secondary-135 {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+  .bg-primary-secondary-155 {
+    background: linear-gradient(155deg, color-mix(in srgb, var(--primary) 24%, transparent), color-mix(in srgb, var(--secondary) 22%, transparent));
+  }
+  .bg-primary-secondary-180 {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 18%, transparent), color-mix(in srgb, var(--secondary) 18%, transparent));
+  }
+  .bg-primary-secondary-205 {
+    background: linear-gradient(205deg, color-mix(in srgb, var(--primary) 24%, transparent), color-mix(in srgb, var(--secondary) 22%, transparent));
+  }
+  .bg-primary-secondary-225 {
+    background: linear-gradient(225deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+  .bg-primary-secondary-270 {
+    background: linear-gradient(270deg, color-mix(in srgb, var(--primary) 20%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+  .bg-primary-secondary-315 {
+    background: linear-gradient(315deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--secondary) 20%, transparent));
+  }
+
+  /* ── Stronger / solid brand gradients for banners & cards ─────────── */
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+  }
+  .bg-brand-gradient-soft {
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--primary) 40%, transparent),
+      color-mix(in srgb, var(--secondary) 40%, transparent));
+  }
+  .bg-brand-gradient-vivid {
+    background: linear-gradient(118deg, var(--primary) 0%, var(--secondary) 100%);
+  }
+
+  /* ── Radial / mesh variants ───────────────────────────────────────── */
+  .bg-primary-secondary-hero {
+    background:
+      radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--primary) 28%, transparent), transparent 46%),
+      radial-gradient(circle at 84% 84%, color-mix(in srgb, var(--secondary) 30%, transparent), transparent 48%),
+      linear-gradient(145deg, color-mix(in srgb, var(--primary) 8%, transparent), color-mix(in srgb, var(--secondary) 8%, transparent));
+  }
+  .bg-primary-secondary-radial {
+    background:
+      radial-gradient(ellipse at top left, color-mix(in srgb, var(--primary) 25%, transparent) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, color-mix(in srgb, var(--secondary) 25%, transparent) 0%, transparent 55%);
+  }
+  .bg-primary-secondary-radial-center {
+    background:
+      radial-gradient(ellipse at center, color-mix(in srgb, var(--primary) 20%, transparent) 0%, transparent 60%),
+      radial-gradient(ellipse at bottom, color-mix(in srgb, var(--secondary) 18%, transparent) 0%, transparent 55%);
+  }
+
+  /* ── Page-level section tints ─────────────────────────────────────── */
+  .bg-page-tint {
+    background:
+      radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 50%),
+      radial-gradient(ellipse at 100% 100%, color-mix(in srgb, var(--secondary) 8%, transparent), transparent 50%);
+  }
+
+  /* ── Shadows ──────────────────────────────────────────────────────── */
+  .shadow-brand-glow {
+    box-shadow:
+      0 10px 35px color-mix(in srgb, var(--primary) 20%, transparent),
+      0 8px 30px color-mix(in srgb, var(--secondary) 15%, transparent);
+  }
+  .shadow-brand-glow-sm {
+    box-shadow:
+      0 4px 16px color-mix(in srgb, var(--primary) 15%, transparent),
+      0 2px 8px color-mix(in srgb, var(--secondary) 10%, transparent);
+  }
+  .shadow-brand-glow-lg {
+    box-shadow:
+      0 20px 60px color-mix(in srgb, var(--primary) 25%, transparent),
+      0 12px 40px color-mix(in srgb, var(--secondary) 20%, transparent);
+  }
+
+  /* ── Active nav gradient ──────────────────────────────────────────── */
   .bg-active-gradient {
     background: linear-gradient(
       135deg,
@@ -264,6 +371,16 @@ body {
       rgba(16, 185, 129, 0.22)
     );
   }
+
+  /* ── Hero gradient ────────────────────────────────────────────────── */
+  .bg-hero-gradient {
+    background: linear-gradient(160deg, rgba(59,130,246,0.08), rgba(16,185,129,0.08));
+  }
+  .dark .bg-hero-gradient {
+    background: linear-gradient(160deg, rgba(59,130,246,0.12), rgba(16,185,129,0.12));
+  }
+
+  /* ── Gradient border persistent ──────────────────────────────────── */
   .gradient-border-persistent {
     position: absolute;
     inset: 0;
@@ -286,6 +403,20 @@ body {
 
   .gradient-border-persistent.active {
     opacity: 0.5;
+  }
+
+  /* ── Text gradients ───────────────────────────────────────────────── */
+  .text-gradient-brand-45 {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-brand-270 {
+    background: linear-gradient(270deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 

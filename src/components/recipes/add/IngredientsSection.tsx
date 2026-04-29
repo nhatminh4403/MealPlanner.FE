@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { Plus, Trash2, AlertCircle, Scale } from "lucide-react";
 import {
   Card,
@@ -19,7 +19,7 @@ import { UnitSelect } from "./UnitSelect";
 import { IngredientSearch } from "./IngredientSearch";
 import { DensitySelector } from "./DensitySelector";
 import { resolveRow } from "@/libs/ingredient-row-helpers";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 
 interface IngredientsSectionProps {
   ingredients: IngredientRow[];

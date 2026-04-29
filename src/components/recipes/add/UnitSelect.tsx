@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 
 interface UnitSelectProps {
   value: Unit | null;
@@ -41,7 +41,8 @@ export function UnitSelect({ value, onChange }: UnitSelectProps) {
           /* Show category accent on the selected value */
           value?.category === "weight" && "data-[state=closed]:text-primary",
           value?.category === "volume" && "data-[state=closed]:text-secondary",
-          value?.category === "count" && "data-[state=closed]:text-amber-500 dark:data-[state=closed]:text-amber-400",
+          value?.category === "count" &&
+            "data-[state=closed]:text-amber-500 dark:data-[state=closed]:text-amber-400",
         )}
       >
         <SelectValue placeholder="Unit" />

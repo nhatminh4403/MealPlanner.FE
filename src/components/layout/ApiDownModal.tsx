@@ -2,8 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { getApiInstance, isDemoMode, setDemoMode } from "@/libs/axios";
-import { WifiOff, RefreshCw, ServerCrash, Construction, Github, PlayCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  WifiOff,
+  RefreshCw,
+  ServerCrash,
+  Construction,
+  Github,
+  PlayCircle,
+} from "lucide-react";
+import { cn } from "@/libs/utils";
 import { abpDefaultApis } from "@/libs/api";
 export function ApiDownModal() {
   const [visible, setVisible] = useState(false);
@@ -13,10 +20,7 @@ export function ApiDownModal() {
 
   const SHOW_DEVELOPMENT_REASON = true;
 
-
   async function ping() {
-
-    
     try {
       await getApiInstance().get("/abp/application-configuration", {
         params: { IncludeLocalizationResources: false },
@@ -54,11 +58,14 @@ export function ApiDownModal() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
-      `}} />
+      `,
+        }}
+      />
 
       {/* ── Backdrop ──────────────────────────────────────────────────── */}
       <div
@@ -76,11 +83,9 @@ export function ApiDownModal() {
         <div className="absolute bottom-1/4 right-1/3 w-[250px] md:w-[400px] h-[250px] md:h-[400px] rounded-full bg-red-500/10 blur-[60px] md:blur-[100px] opacity-50 dark:opacity-30" />
       </div>
 
-
       {/* ── Modal card ────────────────────────────────────────────────── */}
       <div
         className="fixed inset-0 z-[10000] flex items-center justify-center p-2 sm:p-4"
-
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="api-down-title"
@@ -101,21 +106,25 @@ export function ApiDownModal() {
           {/* Gradient top accent bar - Keep fixed at top */}
           <div className="sticky top-0 z-10 h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-red-500 shrink-0" />
 
-
           {/* Inner highlight border */}
           <div className="absolute inset-0 rounded-2xl pointer-events-none">
             <div className="absolute inset-px rounded-2xl border border-white/20 dark:border-white/8" />
           </div>
 
-          <div className={cn(
-            "flex flex-col flex-1 overflow-y-auto scrollbar-none",
-            SHOW_DEVELOPMENT_REASON && "md:flex-row"
-          )}>
+          <div
+            className={cn(
+              "flex flex-col flex-1 overflow-y-auto scrollbar-none",
+              SHOW_DEVELOPMENT_REASON && "md:flex-row",
+            )}
+          >
             {/* ── Left Part: Service Status ──────────────────────────────── */}
-            <div className={cn(
-              "px-5 py-8 md:px-8 md:py-10 flex flex-col items-center text-center gap-4 md:gap-5",
-              SHOW_DEVELOPMENT_REASON && "md:w-1/2 border-b border-[var(--input-border)]/40 md:border-b-0 md:border-r"
-            )}>
+            <div
+              className={cn(
+                "px-5 py-8 md:px-8 md:py-10 flex flex-col items-center text-center gap-4 md:gap-5",
+                SHOW_DEVELOPMENT_REASON &&
+                  "md:w-1/2 border-b border-[var(--input-border)]/40 md:border-b-0 md:border-r",
+              )}
+            >
               {/* Icon */}
               <div
                 className={cn(
@@ -140,11 +149,11 @@ export function ApiDownModal() {
                   id="api-down-desc"
                   className="text-sm text-[var(--muted-fg)] leading-relaxed max-w-[320px] sm:max-w-none"
                 >
-                  The backend API could not be reached. If you are accessing the public demo,
-                  the backend may not be published yet. Check the repository for setup instructions.
-                  If you are the developer, ensure the server is running.
+                  The backend API could not be reached. If you are accessing the
+                  public demo, the backend may not be published yet. Check the
+                  repository for setup instructions. If you are the developer,
+                  ensure the server is running.
                 </p>
-
               </div>
 
               {/* Master Repo Button */}
@@ -164,7 +173,6 @@ export function ApiDownModal() {
                 <Github className="size-4" />
                 Master Repo
               </a>
-
 
               {/* Status pill */}
               <div
@@ -190,7 +198,10 @@ export function ApiDownModal() {
                   "Verify carefully the NEXT_PUBLIC_API_URL environment variable",
                   "Ensure the API port is accessible and not blocked",
                 ].map((tip) => (
-                  <li key={tip} className="flex items-start gap-2.5 text-xs text-[var(--muted-fg)]">
+                  <li
+                    key={tip}
+                    className="flex items-start gap-2.5 text-xs text-[var(--muted-fg)]"
+                  >
                     <span className="mt-0.5 size-1.5 rounded-full bg-primary/50 shrink-0" />
                     {tip}
                   </li>
@@ -270,8 +281,10 @@ export function ApiDownModal() {
                   </h2>
 
                   <p className="text-sm text-[var(--muted-fg)] leading-relaxed">
-                    Development of this full-stack project is currently on pause. While the UI and frontend logic
-                    remain as a demonstration of my current skill set, the backend hosting has been suspended to optimize resources.
+                    Development of this full-stack project is currently on
+                    pause. While the UI and frontend logic remain as a
+                    demonstration of my current skill set, the backend hosting
+                    has been suspended to optimize resources.
                   </p>
                 </div>
 
@@ -282,7 +295,8 @@ export function ApiDownModal() {
                     Reason for Pause
                   </h3>
                   <p className="text-sm text-[var(--muted-fg)] italic leading-relaxed">
-                    &ldquo;My back is so damn painful! I&apos;m waiting for the new replacement for my current swivel chair base &rdquo;
+                    &ldquo;My back is so damn painful! I&apos;m waiting for the
+                    new replacement for my current swivel chair base &rdquo;
                   </p>
                 </div>
 

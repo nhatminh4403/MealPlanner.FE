@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import * as mockData from "./mockData";
+import { AbpApplicationConfiguration } from "./interfaceDTO";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
 const DOCKER_API_URL =
@@ -27,7 +28,17 @@ export const setDemoMode = (enabled: boolean) => {
     localStorage.setItem(DEMO_MODE_KEY, enabled.toString());
   }
 };
-
+export const syncMockModeFromServer = async (): Promise<void> => {
+  try {
+    const res = await fetch(`${API_URL}/api/abp/application-configuration?IncludeLocalizationResources=false`);
+    if (!res.ok) return;
+    const data: AbpApplicationConfiguration = await res.json();
+    const enableMock = data?.setting?.values?.["MealPlannerAPI.EnableMockData"];
+    setDemoMode(enableMock === "True");
+  } catch {
+    // silently fail — keep whatever is in localStorage
+  }
+};
 // ── Interceptor Helpers ──────────────────────────────────────────────────────
 export const getApiInstance = () => {
   return process.env.NEXT_PUBLIC_USE_DOCKER_API === "true" ? dockerApi : api;
@@ -42,7 +53,7 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
 
 const responseInterceptorError = async (error: AxiosError) => {
   if (isDemoMode()) {
-    return Promise.reject(error); // In demo mode, we shouldn't really hit errors if mocked, but just in case
+    return Promise.reject(error); 
   }
   const original = error.config as typeof error.config & { _retry?: boolean };
 

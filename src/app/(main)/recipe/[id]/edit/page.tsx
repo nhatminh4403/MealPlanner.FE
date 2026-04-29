@@ -6,14 +6,8 @@ import { recipes as recipeApi } from "@/libs/api";
 import type { Recipe, CreateRecipeDto } from "@/libs/interfaceDTO";
 import { toast } from "sonner";
 import axios from "axios";
-import { useLocalization } from "@/libs/localization";
-import {
-  Loader2,
-  ArrowLeft,
-  Save,
-  ChefHat,
-  Sparkles,
-} from "lucide-react";
+import { useLocalization } from "@/libs/LocalizationProvider";
+import { Loader2, ArrowLeft, Save, ChefHat, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BasicInfoSection } from "@/components/recipes/add/BasicInfoSection";
 import { IngredientsSection } from "@/components/recipes/add/IngredientsSection";
@@ -51,18 +45,21 @@ function recipeToRows(recipe: Recipe): IngredientRow[] {
     const display = ing.displayQuantity || "";
     const parts = display.trim().split(" ");
     const lastPart = parts[parts.length - 1];
-    const unit = UNITS.find((u) => u.label === lastPart) || UNITS.find((u) => u.label === "g")!;
+    const unit =
+      UNITS.find((u) => u.label === lastPart) ||
+      UNITS.find((u) => u.label === "g")!;
 
     // 2. Determine original Input Quantity
     // If it was "2 tbsp", parts[0] is "2". If just "150", use grams.
-    const qtyInput = parts.length >= 2 ? parseFloat(parts[0]) : ing.quantityGrams;
+    const qtyInput =
+      parts.length >= 2 ? parseFloat(parts[0]) : ing.quantityGrams;
 
     const row: IngredientRow = {
       key: ing.id,
       name: ing.name,
       quantityInput: qtyInput || 0,
       unit: unit,
-      densityGPerMl: 1.0, 
+      densityGPerMl: 1.0,
       gramsOverride: unit.category === "count" ? ing.quantityGrams : 0,
       quantityGrams: ing.quantityGrams,
       displayQuantity: ing.displayQuantity ?? `${ing.quantityGrams} g`,
@@ -71,7 +68,7 @@ function recipeToRows(recipe: Recipe): IngredientRow[] {
       conversionStatus: "ok",
       searchOpen: false,
     };
-    
+
     // resolving ensures density/factors are pre-calculated for the UI
     return resolveRow(row);
   });
@@ -102,7 +99,7 @@ export default function EditRecipePage() {
         setError(null);
         const res = await recipeApi.get(id);
         const data = res.data;
-        
+
         setRecipe(data);
         setForm({
           name: data.name,
@@ -127,8 +124,10 @@ export default function EditRecipePage() {
   }, [id]);
 
   // ── form helpers ──────────────────────────────────────────────────────────
-  const set = <K extends keyof CreateRecipeDto>(key: K, value: CreateRecipeDto[K]) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const set = <K extends keyof CreateRecipeDto>(
+    key: K,
+    value: CreateRecipeDto[K],
+  ) => setForm((prev) => ({ ...prev, [key]: value }));
 
   const updateInstruction = (index: number, value: string) =>
     setForm((prev) => {
@@ -153,7 +152,10 @@ export default function EditRecipePage() {
   };
 
   const removeTag = (tag: string) =>
-    set("tags", form.tags.filter((t) => t !== tag));
+    set(
+      "tags",
+      form.tags.filter((t) => t !== tag),
+    );
 
   // FIX: resolveRow inside setIngredients to prevent "rice vs brown rice" naming bug
   const updateIngredient = (key: string, patch: Partial<IngredientRow>) =>
@@ -172,8 +174,9 @@ export default function EditRecipePage() {
     if (!form.name.trim()) return "Recipe name is required.";
     if (!form.cuisine.trim()) return "Cuisine is required.";
     if (!form.description.trim()) return "Description is required.";
-    if (form.instructions.some((s) => !s.trim())) return "All instruction steps must be filled in.";
-    
+    if (form.instructions.some((s) => !s.trim()))
+      return "All instruction steps must be filled in.";
+
     for (const row of ingredients) {
       if (!row.name.trim()) return "Every ingredient needs a name.";
       if (row.conversionStatus === "needs-density")
@@ -189,7 +192,10 @@ export default function EditRecipePage() {
   // ── submit ────────────────────────────────────────────────────────────────
   const handleSave = async () => {
     const err = validate();
-    if (err) { toast.error(err); return; }
+    if (err) {
+      toast.error(err);
+      return;
+    }
 
     const payload: CreateRecipeDto = {
       ...form,
@@ -211,7 +217,9 @@ export default function EditRecipePage() {
       router.push(`/recipe/${id}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.error?.message ?? "Failed to update recipe.");
+        toast.error(
+          err.response?.data?.error?.message ?? "Failed to update recipe.",
+        );
       } else {
         toast.error("An unexpected error occurred.");
       }
@@ -241,7 +249,6 @@ export default function EditRecipePage() {
 
   return (
     <div className="relative w-full min-h-screen px-4 sm:px-6 pt-24 pb-20 animate-page-in bg-gradient-mesh overflow-hidden">
-      
       {/* Decorative blobs */}
       <div className="pointer-events-none absolute -top-32 -left-32 size-130 rounded-full bg-primary/20 blur-3xl opacity-40" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 size-105 rounded-full bg-secondary/20 blur-3xl opacity-40" />
@@ -249,7 +256,12 @@ export default function EditRecipePage() {
       {/* Header Area */}
       <div className="relative z-10 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="rounded-full"
+          >
             <ArrowLeft className="size-5" />
           </Button>
           <div>
@@ -263,11 +275,23 @@ export default function EditRecipePage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => router.back()} disabled={submitting}>
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={submitting}
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={submitting} className="min-w-32 shadow-lg shadow-primary/20">
-            {submitting ? <Loader2 className="size-4 animate-spin mr-2" /> : <Save className="size-4 mr-2" />}
+          <Button
+            onClick={handleSave}
+            disabled={submitting}
+            className="min-w-32 shadow-lg shadow-primary/20"
+          >
+            {submitting ? (
+              <Loader2 className="size-4 animate-spin mr-2" />
+            ) : (
+              <Save className="size-4 mr-2" />
+            )}
             Save Changes
           </Button>
         </div>
@@ -276,7 +300,6 @@ export default function EditRecipePage() {
       {/* Main Content Grid */}
       <div className="relative z-10 rounded-3xl border border-white/20 dark:border-white/10 bg-white/60 dark:bg-zinc-900/55 backdrop-blur-xl shadow-2xl p-4 sm:p-6">
         <div className="grid gap-6 lg:grid-cols-3">
-          
           {/* Column 1: Basic Info */}
           <div className="lg:col-span-1">
             <BasicInfoSection

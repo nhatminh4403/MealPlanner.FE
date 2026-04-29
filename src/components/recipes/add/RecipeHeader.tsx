@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Children } from "react";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { ChefHat, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -37,8 +37,7 @@ export function RecipeHeader({ children }: { children?: React.ReactNode }) {
         </div>
       </div>
 
-        {children}
-
+      {children}
     </div>
   );
 }

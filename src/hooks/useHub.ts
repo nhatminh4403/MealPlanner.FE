@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useLayoutEffect } from "react";
 import { HubConnectionState } from "@microsoft/signalr";
-import { getHubConnection, startHub, stopHub, HubEvents } from "./signalR-hub";
+import { getHubConnection, startHub, stopHub, HubEvents } from "../libs/signalR-hub";
 import {
   UserNotification,
   MealPlan,
   ShoppingList,
   ShoppingListItem,
   DashboardStats,
-} from "./interfaceDTO";
+} from "../libs/interfaceDTO";
 
 type HubEventHandlers = Partial<{
   onTrendingUpdated: () => void;
@@ -37,10 +37,10 @@ export const useHub = (handlers: HubEventHandlers = {}, enabled = true) => {
 
     const wrap =
       <T extends unknown[]>(key: keyof HubEventHandlers) =>
-      (...args: T) => {
-        const fn = handlersRef.current[key] as ((...a: T) => void) | undefined;
-        fn?.(...args);
-      };
+        (...args: T) => {
+          const fn = handlersRef.current[key] as ((...a: T) => void) | undefined;
+          fn?.(...args);
+        };
 
     const onTrending = wrap("onTrendingUpdated");
     const onStats = wrap("onStatsUpdated");

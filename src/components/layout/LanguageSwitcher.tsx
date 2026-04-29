@@ -1,4 +1,4 @@
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { AvailableLanguage } from "@/libs/enums";
 import { Globe } from "lucide-react";
 

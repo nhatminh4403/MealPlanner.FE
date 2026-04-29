@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CreateRecipeDto } from "@/libs/interfaceDTO";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 import { Clock, Tag as TagIcon, Image as ImageIcon, X } from "lucide-react";
 import {
   Card,

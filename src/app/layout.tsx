@@ -3,12 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/libs/ThemeProvider";
-import { LocalizationProvider } from "@/libs/localization";
+import { LocalizationProvider } from "@/libs/LocalizationProvider";
 import { NotificationProvider } from "@/libs/NotificationProvider";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
 import { ApiDownModal } from "@/components/layout/ApiDownModal";
+import AppInitializer from "@/libs/AppInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +55,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-50 text-zinc-900 transition-colors duration-300 dark:bg-black dark:text-zinc-50`}
       >
         <ApiDownModal />
+        <AppInitializer />
         <ThemeProvider>
           <LocalizationProvider>
             <NotificationProvider>

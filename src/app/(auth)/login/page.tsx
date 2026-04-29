@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { login } from "@/libs/axios";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/localization";
+import { useLocalization } from "@/libs/LocalizationProvider";
 
 export default function Login() {
   const { L } = useLocalization();
@@ -32,14 +32,14 @@ export default function Login() {
 
     try {
       await login(usernameOrEmail, password);
-      toast.success(L("MealPlannerAPI", "SuccessfullyLoggedIn"));
+      toast.success(L("MealPlannerAPI", "Auth:SuccessfullyLoggedIn"));
       router.push("/");
       router.refresh();
     } catch (error: unknown) {
       toast.error(
         error instanceof Error
           ? error.message
-          : L("MealPlannerAPI", "LoginFailed"),
+          : L("MealPlannerAPI", "Auth:LoginFailed"),
       );
     } finally {
       setIsLoading(false);
@@ -47,18 +47,18 @@ export default function Login() {
   };
 
   return (
-    <Card className="shadow-2xl bg-background/60 backdrop-blur-xl relative overflow-hidden gradient-border-static">
-      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary to-secondary" />
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-primary to-secondary" />
-      <div className="absolute top-0 left-0 h-full w-1 bg-linear-to-r from-primary to-secondary" />
-      <div className="absolute top-0 right-0 h-full w-1 bg-linear-to-r from-primary to-secondary" />
+    <Card className="shadow-2xl bg-background/60 backdrop-blur-xl relative overflow-hidden gradient-border-static bg-gradient-sheen">
+      <div className="absolute top-0 left-0 w-full h-1 bg-primary-secondary-25" />
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-secondary-205" />
+      <div className="absolute top-0 left-0 h-full w-1 bg-primary-secondary-115" />
+      <div className="absolute top-0 right-0 h-full w-1 bg-primary-secondary-155" />
 
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold tracking-tight text-center">
-          {L("MealPlannerAPI", "WelcomeBack")}
+          {L("MealPlannerAPI", "Auth:WelcomeBack")}
         </CardTitle>
         <CardDescription className="text-center">
-          {L("MealPlannerAPI", "SignInDescription")}
+          {L("MealPlannerAPI", "Auth:SignInDescription")}
         </CardDescription>
       </CardHeader>
 
@@ -66,12 +66,12 @@ export default function Login() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="identifier">
-              {L("MealPlannerAPI", "EmailOrUsername")}
+              {L("MealPlannerAPI", "Auth:EmailOrUsername")}
             </Label>
             <Input
               id="identifier"
               type="text"
-              placeholder={L("MealPlannerAPI", "EmailOrUsername")}
+              placeholder={L("MealPlannerAPI", "Auth:EmailOrUsername")}
               className="bg-background/50"
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
@@ -81,13 +81,13 @@ export default function Login() {
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">
-                {L("MealPlannerAPI", "Password")}
+                {L("MealPlannerAPI", "Auth:Password")}
               </Label>
               <Link
                 href="/forgot-password"
                 className="text-sm font-medium text-primary hover:underline hover:text-primary/80 transition-colors"
               >
-                {L("MealPlannerAPI", "ForgotPassword")}
+                {L("MealPlannerAPI", "Auth:ForgotPassword")}
               </Link>
             </div>
             <Input
@@ -105,7 +105,7 @@ export default function Login() {
               htmlFor="remember"
               className="text-sm font-medium leading-none cursor-pointer"
             >
-              {L("MealPlannerAPI", "RememberMe")}
+              {L("MealPlannerAPI", "Auth:RememberMe")}
             </Label>
           </div>
         </CardContent>
@@ -117,16 +117,16 @@ export default function Login() {
             disabled={isLoading}
           >
             {isLoading
-              ? L("MealPlannerAPI", "SigningIn")
-              : L("MealPlannerAPI", "SignIn")}
+              ? L("MealPlannerAPI", "Auth:SigningIn")
+              : L("MealPlannerAPI", "Auth:SignIn")}
           </Button>
           <div className="text-center text-sm text-muted-foreground">
-            {L("MealPlannerAPI", "NoAccount")}?{" "}
+            {L("MealPlannerAPI", "Auth:NoAccount")}?{" "}
             <Link
               href="/register"
               className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors"
             >
-              {L("MealPlannerAPI", "CreateAccount")}
+              {L("MealPlannerAPI", "Auth:CreateAccount")}
             </Link>
           </div>
         </CardFooter>
