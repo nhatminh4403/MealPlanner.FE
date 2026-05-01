@@ -18,12 +18,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { login } from "@/libs/axios";
 import { toast } from "sonner";
 import { useLocalization } from "@/libs/LocalizationProvider";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const { L } = useLocalization();
   const router = useRouter();
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,10 +50,8 @@ export default function Login() {
 
   return (
     <Card className="shadow-2xl bg-background/60 backdrop-blur-xl relative overflow-hidden gradient-border-static bg-gradient-sheen">
-      <div className="absolute top-0 left-0 w-full h-1 bg-primary-secondary-25" />
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-secondary-205" />
-      <div className="absolute top-0 left-0 h-full w-1 bg-primary-secondary-115" />
-      <div className="absolute top-0 right-0 h-full w-1 bg-primary-secondary-155" />
+      <div className="absolute inset-0 rounded-[inherit] border-t border-b border-l border-r pointer-events-none 
+      border-t-primary-secondary-25 border-b-primary-secondary-205 border-l-primary-secondary-115 border-r-primary-secondary-155 opacity-80" />
 
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold tracking-tight text-center">
@@ -90,14 +90,24 @@ export default function Login() {
                 {L("MealPlannerAPI", "Auth:ForgotPassword")}
               </Link>
             </div>
-            <Input
-              id="password"
-              type="password"
-              className="bg-background/50"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="bg-background/50 pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button
+                onClick={() => setShowPassword(!showPassword)}
+                type="button"
+                variant="ghost"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground border-l border-muted/30 rounded-l-none rounded-r-md"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
           </div>
           <div className="flex items-center space-x-2 mb-2 pb-1">
             <Checkbox id="remember" />

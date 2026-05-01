@@ -2,6 +2,10 @@ import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "ax
 import * as mockData from "./mockData";
 import { AbpApplicationConfiguration } from "./interfaceDTO";
 
+if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
 const DOCKER_API_URL =
   process.env.NEXT_PUBLIC_DOCKER_API_URL || "https://localhost:44339";

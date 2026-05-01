@@ -19,6 +19,7 @@ import { register } from "@/libs/axios";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLocalization } from "@/libs/LocalizationProvider";
+import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 export default function Register() {
   const { L } = useLocalization();
@@ -28,9 +29,11 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
+    userName: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -43,10 +46,10 @@ export default function Register() {
 
     try {
       await register({
-        userName: formData.email, // ABP usually uses email as username or requires both
         emailAddress: formData.email,
         password: formData.password,
         name: formData.name,
+        userName: formData.userName,
         appName: "MealPlanner",
       });
       toast.success(L("MealPlannerAPI", "Auth:RegistrationSuccessful"));
@@ -75,11 +78,10 @@ export default function Register() {
   };
 
   return (
-    <Card className="shadow-2xl bg-background/60 backdrop-blur-xl relative overflow-hidden gradient-border-static bg-gradient-sheen">
-      <div className="absolute top-0 left-0 w-full h-1 bg-primary-secondary-65" />
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-secondary-205" />
-      <div className="absolute top-0 left-0 h-full w-1 bg-primary-secondary-25" />
-      <div className="absolute top-0 right-0 h-full w-1 bg-primary-secondary-155" />
+    <Card className="shadow-2xl bg-background/60 backdrop-blur-xl 
+    relative overflow-hidden gradient-border-static bg-gradient-sheen mt-8">
+      <div className="absolute inset-0 rounded-[inherit] border-t border-b border-l border-r pointer-events-none 
+      border-t-primary-secondary-65 border-b-primary-secondary-205 border-l-primary-secondary-25 border-r-primary-secondary-155 opacity-80" />
 
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold tracking-tight text-center">
@@ -108,6 +110,21 @@ export default function Register() {
             />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="name">{L("MealPlannerAPI", "Auth:UserName")}</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder={L(
+                "MealPlannerAPI",
+                "Auth:RegistrationNamePlaceholder",
+              )}
+              className="bg-background/50"
+              value={formData.userName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="email">{L("MealPlannerAPI", "Auth:Email")}</Label>
             <Input
               id="email"
@@ -127,27 +144,51 @@ export default function Register() {
               <Label htmlFor="password">
                 {L("MealPlannerAPI", "Auth:Password")}
               </Label>
-              <Input
-                id="password"
-                type="password"
-                className="bg-background/50"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  className="bg-background/50 pr-10"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <Button
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                  variant="ghost"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground border-l border-muted/30 rounded-l-none rounded-r-md"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </Button>
+              </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirmPassword">
                 {L("MealPlannerAPI", "Common:Confirm")}
               </Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                className="bg-background/50"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  className="bg-background/50 pr-10"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+                <Button
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  type="button"
+                  variant="ghost"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground border-l border-muted/30 rounded-l-none rounded-r-md"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
           <div className="flex items-center space-x-2 pb-3">

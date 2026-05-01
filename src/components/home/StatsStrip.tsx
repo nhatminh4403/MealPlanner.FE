@@ -58,6 +58,7 @@ function formatValue(
 ): string {
   if (stats === null) return "—";
   const raw = stats[key];
+  if (raw == null) return "—";
   if (key === "averageRating") return (raw as number).toFixed(1);
   if (typeof raw === "number" && raw >= 1000)
     return `${(raw / 1000).toFixed(1)}k`;

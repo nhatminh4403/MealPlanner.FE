@@ -8,7 +8,7 @@ import { ChefHat, Sparkles, ArrowRight } from "lucide-react";
 export interface HeroSectionProps {
   isAuthenticated: boolean;
 }
-
+ 
 const FOOD_EMOJIS = [
   "🍜",
   "🥗",

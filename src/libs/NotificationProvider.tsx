@@ -30,8 +30,6 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined,
 );
 
-// SignalR sends UserNotificationDto (number type), REST returns UserNotification (string type).
-// Normalize so both work in the same list.
 function normalize(dto: UserNotification): UserNotification {
   const typeMap: Record<number, string> = {
     0: "Default",

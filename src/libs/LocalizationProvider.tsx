@@ -9,6 +9,17 @@ import {
 import { abpDefaultApis } from "@/libs/api";
 import { AvailableLanguage } from "@/libs/enums";
 
+const LOCALE_STORAGE_KEY = "preferred_locale";
+
+const VALID_LOCALES = new Set<string>(Object.values(AvailableLanguage));
+
+function getSavedLocale(): AvailableLanguage {
+  if (typeof window === "undefined") return AvailableLanguage.en;
+  const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
+  if (saved && VALID_LOCALES.has(saved)) return saved as AvailableLanguage;
+  return AvailableLanguage.en;
+}
+
 type ResourceMap = Record<string, Record<string, string>>;
 
 interface LocalizationContextValue {
@@ -30,12 +41,27 @@ export function LocalizationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [locale, setLocale] = useState<AvailableLanguage>(AvailableLanguage.en);
+  // Start with "en" for SSR, then sync from localStorage after mount
+  const [locale, setLocaleState] = useState<AvailableLanguage>(AvailableLanguage.en);
   const [resourceMap, setResourceMap] = useState<ResourceMap>({});
   const [isLoading, setIsLoading] = useState(true);
 
+  // Hydrate locale from localStorage on first mount
+  useEffect(() => {
+    const saved = getSavedLocale();
+    if (saved !== locale) setLocaleState(saved);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist + apply locale changes
+  const setLocale = useCallback((lang: AvailableLanguage) => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, lang);
+    setLocaleState(lang);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
+    setIsLoading(true);
 
     abpDefaultApis
       .localization(locale)
@@ -53,11 +79,10 @@ export function LocalizationProvider({
       });
 
     return () => {
-      cancelled = true; // cleanup if locale changes mid-fetch
+      cancelled = true;
     };
   }, [locale]);
 
-  // L("MealPlannerAPI", "MealPlan") → "Meal Plan" (falls back to key)
   const L = useCallback(
     (resourceName: string, key: string) =>
       resourceMap[resourceName]?.[key] ?? key,

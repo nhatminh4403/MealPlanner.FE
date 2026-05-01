@@ -1,62 +1,41 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { recipes as recipeApi, dashboard } from "@/libs/api";
-import { isAuthenticated } from "@/libs/axios";
+import React from "react";
+import { recipes as recipeApi, dashboard, abpDefaultApis } from "@/libs/api";
+import { AvailableLanguage } from "@/libs/enums";
 import HeroSection from "@/components/home/HeroSection";
 import StatsStrip from "@/components/home/StatsStrip";
 import FeatureHighlights from "@/components/home/FeatureHighlights";
 import CTASection from "@/components/home/CTASection";
 import RecipeSection from "@/components/recipes/base/RecipeSection";
-import type {
-  DashboardStats,
-  RecipeSummary,
-  TrendingRecipe,
-} from "@/libs/interfaceDTO";
 import { Star, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { cookies } from "next/headers";
 
-export default function Home() {
-  const { L } = useLocalization();
+async function getServerLocalization() {
+  try {
+    const res = await abpDefaultApis.localization(AvailableLanguage.en);
+    const resources = res.data.resources;
+    return (resourceName: string, key: string) => {
+      return resources[resourceName]?.texts?.[key] ?? key;
+    };
+  } catch (error) {
+    return (resourceName: string, key: string) => key;
+  }
+}
 
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
-  const [topRated, setTopRated] = useState<RecipeSummary[]>([]);
-  const [topRatedLoading, setTopRatedLoading] = useState(true);
-  const [trending, setTrending] = useState<TrendingRecipe[]>([]);
-  const [trendingLoading, setTrendingLoading] = useState(true);
-  
-  const authenticated = isAuthenticated();
+export default async function Home() {
+  const cookieStore = await cookies();
+  const authenticated = !!cookieStore.get("access_token")?.value;
+  const L = await getServerLocalization();
 
-  useEffect(() => {
+  const [statsResult, topRatedResult, trendingResult] = await Promise.allSettled([
+    dashboard.getStats(),
+    recipeApi.getTopRated(8),
+    dashboard.getTrending(),
+  ]);
 
-    async function fetchAll() {
-      const [statsResult, topRatedResult, trendingResult] =
-        await Promise.allSettled([
-          dashboard.getStats(),
-          recipeApi.getTopRated(8),
-          dashboard.getTrending(),
-        ]);
-
-      if (statsResult.status === "fulfilled") {
-        setStats(statsResult.value.data);
-      }
-      setStatsLoading(false);
-
-      if (topRatedResult.status === "fulfilled") {
-        setTopRated(topRatedResult.value.data.items ?? []);
-      }
-      setTopRatedLoading(false);
-
-      if (trendingResult.status === "fulfilled") {
-        setTrending(trendingResult.value.data.items ?? []);
-      }
-      setTrendingLoading(false);
-    }
-
-    fetchAll();
-  }, []);
+  const stats = statsResult.status === "fulfilled" ? statsResult.value.data : null;
+  const topRated = topRatedResult.status === "fulfilled" ? topRatedResult.value.data.items ?? [] : [];
+  const trending = trendingResult.status === "fulfilled" ? trendingResult.value.data.items ?? [] : [];
 
   return (
     <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 pt-24 pb-16 min-h-screen space-y-16">
@@ -64,7 +43,7 @@ export default function Home() {
       <HeroSection isAuthenticated={authenticated} />
 
       {/* 2. Stats Strip */}
-      <StatsStrip stats={stats} loading={statsLoading} />
+      <StatsStrip stats={stats} loading={false} />
 
       {/* 3. Feature Highlights */}
       <FeatureHighlights />
@@ -98,7 +77,7 @@ export default function Home() {
           title=""
           icon={<></>}
           recipes={topRated}
-          loading={topRatedLoading}
+          loading={false}
           emptyMessage={L("MealPlannerAPI", "Recipes:NoTopRatedRecipes")}
         />
       </div>
@@ -132,7 +111,7 @@ export default function Home() {
           title=""
           icon={<></>}
           recipes={trending}
-          loading={trendingLoading}
+          loading={false}
           emptyMessage={L("MealPlannerAPI", "Recipes:NoTrendingRecipes")}
           variant="trending"
         />
