@@ -31,6 +31,7 @@ import {
   GetMealPlansInput,
   ApplicationLocalizationResponse,
   ApplicationConfigurationResponse,
+  GetShoppingListsInput,
 } from "./interfaceDTO";
 
 export const abpDefaultApis = {
@@ -84,6 +85,9 @@ export const recipes = {
 export const mealPlans = {
   getMine: () => http().get<MealPlan>("/app/meal-plans"),
 
+  getUserCurrentWeekMealPlan: () =>
+    http().get<MealPlan>(`/app/meal-plans/current-week`),
+  
   getListByUserId: (params?: GetMealPlansInput) =>
     http().get<PagedResult<MealPlan>>("/app/meal-plans", { params }),
 
@@ -100,7 +104,7 @@ export const mealPlans = {
 // ── Shopping Lists ────────────────────────────────────────────────────────────
 
 export const shoppingLists = {
-  getList: () => http().get<PagedResult<ShoppingList>>("/app/shopping-lists"),
+  getList: (params?: GetShoppingListsInput) => http().get<PagedResult<ShoppingList>>("/app/shopping-lists",{params}),
 
   get: (id: string) => http().get<ShoppingList>(`/app/shopping-lists/${id}`),
 

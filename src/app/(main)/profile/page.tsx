@@ -124,7 +124,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
-                    {profile?.followersCount || 0}
+                    {profile?.stats?.followers || 0}
                   </p>
                   <p className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">
                     {L("MealPlannerAPI", "Followers")}
@@ -133,7 +133,7 @@ export default function ProfilePage() {
                 <div className="w-px h-8 bg-zinc-100 dark:bg-zinc-800" />
                 <div className="text-center">
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
-                    {profile?.followingCount || 0}
+                    {profile?.stats?.following || 0}
                   </p>
                   <p className="text-xs text-zinc-500 uppercase tracking-widest font-semibold">
                     {L("MealPlannerAPI", "Following")}

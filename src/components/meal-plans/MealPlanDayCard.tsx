@@ -51,7 +51,7 @@ const MEAL_SLOTS = [
 interface MealPlanDayCardProps {
   dayName: string;
   dayEntries: MealPlanEntry[];
-  mealPlanId: string;
+  mealPlanId?: string;
   onDeleteEntry?: (entryId: string) => void;
 }
 
@@ -65,7 +65,7 @@ export function MealPlanDayCard({
   const getEntryForSlot = (mealType: number) =>
     dayEntries.find((e) => e.mealType === mealType);
   const filledCount = dayEntries.length;
-
+  console.log("meal plan id: ",mealPlanId);
   return (
     <Card
       className="border-none bg-white/40 dark:bg-zinc-900/40 backdrop-blur-md shadow-xl rounded-3xl 
@@ -89,7 +89,6 @@ export function MealPlanDayCard({
 
           if (entry) {
             const inner = (
-              // min-h-[4rem] matches the empty slot's p-4 + label + "+ Add meal" line height
               <div
                 className={`group flex items-stretch min-h-[4rem] p-3 rounded-2xl border transition-all shadow-sm ${slot.filled}`}
               >
@@ -138,6 +137,7 @@ export function MealPlanDayCard({
 
           // ── Empty slot ────────────────────────────────────────────────────
           return (
+            
             <Link
               key={slot.type}
               href={`/meal-plans/${mealPlanId}/entries/add?day=${dayIndex}&type=${slot.type}`}

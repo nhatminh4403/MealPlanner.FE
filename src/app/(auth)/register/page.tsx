@@ -110,9 +110,9 @@ export default function Register() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="name">{L("MealPlannerAPI", "Auth:UserName")}</Label>
+            <Label htmlFor="userName">{L("MealPlannerAPI", "Auth:UserName")}</Label>
             <Input
-              id="username"
+              id="userName"
               type="text"
               placeholder={L(
                 "MealPlannerAPI",

@@ -16,6 +16,7 @@ import { IngredientsSection } from "@/components/recipes/add/IngredientsSection"
 import { InstructionsSection } from "@/components/recipes/add/InstructionsSection";
 import { createEmptyRow, resolveRow } from "@/libs/ingredient-row-helpers";
 import { IngredientRow } from "@/libs/recipe-form-types";
+import { mealPlans } from "@/libs/api";
 
 const emptyForm = (): CreateRecipeDto => ({
   name: "",
@@ -38,9 +39,27 @@ export default function AddRecipePage() {
   const [ingredients, setIngredients] = useState<IngredientRow[]>([
     createEmptyRow(),
   ]);
+  const [mealPlanContext, setMealPlanContext] = useState<{
+    mealPlanId: string;
+    dayOfWeek: number;
+    mealType: number;
+    mealName: string;
+  } | null>(null);
 
   const { L } = useLocalization();
   const router = useRouter();
+
+  // Check for meal plan context on mount
+  React.useEffect(() => {
+    const stored = localStorage.getItem("mealPlanContext");
+    if (stored) {
+      try {
+        setMealPlanContext(JSON.parse(stored));
+      } catch {
+        // Invalid JSON, ignore
+      }
+    }
+  }, []);
 
   const set = <K extends keyof CreateRecipeDto>(
     key: K,
@@ -158,7 +177,28 @@ export default function AddRecipePage() {
         L("MealPlannerAPI", "RecipeCreatedSuccessfully") ||
           "Recipe created successfully!",
       );
-      router.push(`/recipe/${response.data.id}`);
+
+      // If we have meal plan context, add the recipe to the meal plan
+      if (mealPlanContext) {
+        try {
+          await mealPlans.addEntry(mealPlanContext.mealPlanId, {
+            recipeId: response.data.id,
+            mealType: mealPlanContext.mealType,
+            dayOfWeek: mealPlanContext.dayOfWeek,
+            mealName: mealPlanContext.mealName,
+          });
+          localStorage.removeItem("mealPlanContext");
+          toast.success("Recipe added to your meal plan!");
+          router.push("/meal-plans");
+        } catch {
+          // Recipe created but failed to add to meal plan
+          toast.error("Recipe created but failed to add to meal plan.");
+          router.push(`/recipe/${response.data.id}`);
+        }
+      } else {
+        router.push(`/recipe/${response.data.id}`);
+      }
+
       setForm(emptyForm());
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -181,10 +221,22 @@ export default function AddRecipePage() {
   return (
     <div className="relative w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in bg-gradient-mesh overflow-hidden">
       <RecipeHeader>
+        {mealPlanContext && (
+          <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+            <p className="text-sm text-primary font-medium">
+              Creating recipe for: {mealPlanContext.mealName}
+            </p>
+          </div>
+        )}
         <div className="flex justify-end gap-3 pb-12">
           <Button
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => {
+              if (mealPlanContext) {
+                localStorage.removeItem("mealPlanContext");
+              }
+              router.back();
+            }}
             disabled={submitting}
           >
             {L("AbpUi", "Cancel") || "Cancel"}
@@ -202,7 +254,9 @@ export default function AddRecipePage() {
             ) : (
               <span className="flex items-center gap-2">
                 <Save className="size-4" />
-                {L("MealPlannerAPI", "CreateRecipe") || "Create Recipe"}
+                {mealPlanContext
+                  ? "Create & Add to Meal Plan"
+                  : L("MealPlannerAPI", "CreateRecipe") || "Create Recipe"}
               </span>
             )}
           </Button>

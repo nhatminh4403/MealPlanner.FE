@@ -80,7 +80,6 @@ export default function RecipePage() {
         setAllRecipesTotal(0);
       } finally {
         setLoading((p) => ({ ...p, allRecipes: false }));
-        // Let the new data paint first, THEN fade back in
         setTimeout(() => setIsPageTransitioning(false), 80);
       }
     }

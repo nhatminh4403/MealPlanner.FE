@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { Plus, ShoppingCart, Trash2, Check, ShoppingBag } from "lucide-react";
-import { shoppingLists } from "@/libs/api";
+import { shoppingLists, userProfiles } from "@/libs/api";
 import { ShoppingList } from "@/libs/interfaceDTO";
 import { ShoppingListCategory } from "@/libs/enums";
 import { toast } from "sonner";
@@ -17,7 +17,11 @@ export default function ShoppingListsPage() {
 
   const loadUserShoppingList = useCallback(async () => {
     try {
-      const res = await shoppingLists.getList();
+      const currentUser = userProfiles.getMe();
+      const userId = (await currentUser).data.id;
+      const res = await shoppingLists.getList( {
+        UserId : userId
+      });
       setUserShoppingLists(res.data.items);
     } catch {
       toast.error(L("MealPlannerAPI", "ShoppingList:LoadFailed"));

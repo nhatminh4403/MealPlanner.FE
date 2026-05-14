@@ -13,6 +13,8 @@ import RecipeSelectionSkeleton from "@/components/recipes/selection/RecipeSelect
 import EmptyRecipesState from "@/components/recipes/base/EmptyRecipesState";
 import AddMealPlanHeader from "@/components/meal-plans/selection/AddMealPlanHeader";
 import RecipeSelectionToolbar from "@/components/recipes/selection/RecipeSelectionToolbar";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const MEAL_TYPES = [
   { label: "Breakfast", value: MealType.Breakfast },
@@ -141,6 +143,20 @@ export default function AddMealPlanEntryPage({
     }
   };
 
+  const handleCreateNewRecipe = () => {
+    // Store meal plan context in localStorage
+    localStorage.setItem(
+      "mealPlanContext",
+      JSON.stringify({
+        mealPlanId: id,
+        dayOfWeek: day,
+        mealType: type,
+        mealName: mealName,
+      }),
+    );
+    router.push("/recipe/add");
+  };
+
   return (
     <Tabs defaultValue="top-rated" className="w-full flex flex-col">
       <div className="flex-1 w-full min-h-screen pt-24 pb-16 px-6 lg:px-12 2xl:px-20 flex flex-col animate-page-in">
@@ -153,11 +169,20 @@ export default function AddMealPlanEntryPage({
               colors={colors}
             />
 
-            <RecipeSelectionToolbar
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              tabs={SELECTION_TABS}
-            />
+            <div className="flex items-center justify-between gap-4">
+              <RecipeSelectionToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                tabs={SELECTION_TABS}
+              />
+              <Button
+                onClick={handleCreateNewRecipe}
+                className="shrink-0 bg-primary hover:bg-primary/90"
+              >
+                <Plus className="size-4 mr-2" />
+                Create New Recipe
+              </Button>
+            </div>
           </div>
 
           {/* ── Tab Content ── */}

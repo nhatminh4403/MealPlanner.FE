@@ -209,17 +209,27 @@ export default function Header() {
                 <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-zinc-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950">
                   {isLoggedIn ? (
                     <>
-                      <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                      <Link
+                        href="/profile"
+                        className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
                         <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                          {userProfile?.name ||
-                            userProfile?.userName ||
-                            "Null?"}
+                          {userProfile?.name || userProfile?.userName ||
+                            userProfile?.userName }
                         </p>
                         <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                           {userProfile?.email || ""}
                         </p>
-                      </div>
+                      </Link>
                       <div className="py-1">
+                        <Link
+                          href="/profile"
+                          className="block px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          {L("MealPlannerAPI", "User:Profile")}
+                        </Link>
                         <Link
                           href={
                             userProfile
@@ -363,7 +373,11 @@ export default function Header() {
             {/* User section */}
             {isLoggedIn ? (
               <div className="flex items-center justify-between px-4 py-4">
-                <div className="flex items-center gap-3">
+                <Link
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 transition-opacity hover:opacity-80"
+                >
                   <div className="gradient-border flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                     {userProfile?.avatarUrl ? (
                       <Image
@@ -390,18 +404,27 @@ export default function Header() {
                       {userProfile?.email || ""}
                     </p>
                   </div>
-                </div>
-                <Link
-                  href={
-                    userProfile
-                      ? `/profile/${userProfile.id}/settings`
-                      : "/settings"
-                  }
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                >
-                  Settings
                 </Link>
+                <div className="flex gap-2">
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href={
+                      userProfile
+                        ? `/profile/${userProfile.id}/settings`
+                        : "/settings"
+                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  >
+                    Settings
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-4 px-8 py-6">

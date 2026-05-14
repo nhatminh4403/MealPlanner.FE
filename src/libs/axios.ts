@@ -54,7 +54,14 @@ const requestInterceptor = (config: InternalAxiosRequestConfig) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 };
-
+const unwrapInterceptor = (response: AxiosResponse) => {
+  if (response.data?.success !== undefined && 'data' in response.data) {
+    response.data = response.data.data;
+  }
+  return response;
+};
+api.interceptors.response.use(unwrapInterceptor);
+dockerApi.interceptors.response.use(unwrapInterceptor);
 const responseInterceptorError = async (error: AxiosError) => {
   if (isDemoMode()) {
     return Promise.reject(error); 
@@ -127,12 +134,12 @@ const mockInterceptor = async (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-// Apply interceptors
-api.interceptors.request.use(mockInterceptor);
+// // Apply interceptors
+// api.interceptors.request.use(mockInterceptor);
 api.interceptors.request.use(requestInterceptor);
 api.interceptors.response.use((res) => res, responseInterceptorError);
 
-dockerApi.interceptors.request.use(mockInterceptor);
+// dockerApi.interceptors.request.use(mockInterceptor);
 dockerApi.interceptors.request.use(requestInterceptor);
 dockerApi.interceptors.response.use((res) => res, responseInterceptorError);
 

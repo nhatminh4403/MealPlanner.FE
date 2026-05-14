@@ -9,6 +9,7 @@ import RecipeSection from "@/components/recipes/base/RecipeSection";
 import { Star, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
 
 async function getServerLocalization() {
   try {
@@ -21,7 +22,34 @@ async function getServerLocalization() {
     return (resourceName: string, key: string) => key;
   }
 }
+// Replace the three Promise.allSettled calls with native fetch:
+async function getTopRated(): Promise<RecipeSummary[]> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/app/recipe/top-rated?count=8`,
+      { next: { revalidate: 300 } } // cache 5 min
+    );
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data?.items ?? [];
+  } catch {
+    return [];
+  }
+}
 
+async function getTrending(): Promise<TrendingRecipe[]> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/app/dashboard/trending`,
+      { next: { revalidate: 300 } }
+    );
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data?.items ?? [];
+  } catch {
+    return [];
+  }
+}
 export default async function Home() {
   const cookieStore = await cookies();
   const authenticated = !!cookieStore.get("access_token")?.value;
@@ -29,13 +57,13 @@ export default async function Home() {
 
   const [statsResult, topRatedResult, trendingResult] = await Promise.allSettled([
     dashboard.getStats(),
-    recipeApi.getTopRated(8),
-    dashboard.getTrending(),
+  getTopRated(),
+  getTrending(),
   ]);
 
   const stats = statsResult.status === "fulfilled" ? statsResult.value.data : null;
-  const topRated = topRatedResult.status === "fulfilled" ? topRatedResult.value.data.items ?? [] : [];
-  const trending = trendingResult.status === "fulfilled" ? trendingResult.value.data.items ?? [] : [];
+  const topRated = topRatedResult.status === "fulfilled" ? topRatedResult.value : [];
+  const trending = trendingResult.status === "fulfilled" ? trendingResult.value : [];
 
   return (
     <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 pt-24 pb-16 min-h-screen space-y-16">

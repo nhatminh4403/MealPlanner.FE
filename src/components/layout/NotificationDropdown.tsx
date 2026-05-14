@@ -58,6 +58,9 @@ export function NotificationDropdown() {
   const { unreadCount, recentItems, markItemRead, markAllItemsRead } =
     useNotifications();
 
+  // Safety check - should never happen if provider is set up correctly
+  const items = recentItems ?? [];
+
   const handleMarkAsRead = async (item: UserNotification) => {
     if (item.isRead) return;
     try {
@@ -144,7 +147,7 @@ export function NotificationDropdown() {
 
         {/* ── List ─────────────────────────────────────────────── */}
         <ScrollArea className="max-h-100">
-          {recentItems.length === 0 ? (
+          {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 px-4 text-center">
               <div
                 className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800
@@ -161,7 +164,7 @@ export function NotificationDropdown() {
             </div>
           ) : (
             <div className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60">
-              {recentItems.map((item) => {
+              {items.map((item) => {
                 const cfg = getTypeConfig(item.type);
                 const Icon = cfg.icon;
                 return (

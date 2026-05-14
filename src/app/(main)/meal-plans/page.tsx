@@ -61,23 +61,11 @@ export default function MealPlansPage() {
       setError(null);
       const token = await getAccessToken();
       if (token) {
-        const profileResponse = await userProfiles.getMe({
-          signal: controller.signal,
-        });
-        const currentUserId = profileResponse.data.id;
-
-        const mealPlanResponse = await mealPlans.getListByUserId({
-          userId: currentUserId,
-          maxResultCount: 1,
-          skipCount: 0,
-        });
-
-        if (
-          mealPlanResponse.data.items &&
-          mealPlanResponse.data.items.length > 0
-        ) {
-          setUserMealPlans(mealPlanResponse.data.items[0]);
-          console.log("Meal plan fetched:", mealPlanResponse.data.items[0]);
+        const response = await mealPlans.getUserCurrentWeekMealPlan();
+        const mealPlanData = response.data;
+        if (mealPlanData) {
+          setUserMealPlans(mealPlanData);
+          console.log("Current Meal Plan ID:", mealPlanData.id);
         } else {
           setUserMealPlans(null);
         }
@@ -96,7 +84,6 @@ export default function MealPlansPage() {
     fetchMealPlans();
     return () => controller.abort();
   }, []);
-
   const handleDeleteEntry = async (entryId: string) => {
     if (!userMealPlans) return;
     try {
@@ -140,7 +127,7 @@ export default function MealPlansPage() {
   };
 
   const organizedEntries = organizeByDay();
-
+  console.log();
   return (
     <div className="w-full px-4 sm:px-6 pt-24 pb-16 min-h-screen animate-page-in">
       <AppPageHeader
@@ -211,7 +198,7 @@ export default function MealPlansPage() {
                       key={dayName.value}
                       dayName={L("MealPlannerAPI", dayName.labelKey)}
                       dayIndex={dayName.value}
-                      mealPlanId={userMealPlans?.id ?? ""}
+                      mealPlanId={userMealPlans?.id}
                       dayEntries={organizedEntries[dayName.value] ?? []}
                       onDeleteEntry={handleDeleteEntry}
                     />

@@ -153,7 +153,10 @@ export interface ShoppingList {
   items: ShoppingListItem[];
   creationTime: string;
 }
-
+export interface GetShoppingListsInput extends PagedRequest {
+  keyword?: string;
+  UserId?: string;
+}
 export interface AddShoppingItemDto {
   name: string;
   quantity?: string;
@@ -210,8 +213,9 @@ export interface UserProfile {
   surname?: string;
   email: string;
   avatarUrl?: string;
-  followersCount: number;
-  followingCount: number;
+  stats: UserStats;
+  followersCount?: never; // remove these flat fields
+  followingCount?: never;
 }
 
 export interface UpdateProfileInfoDto {
@@ -219,6 +223,15 @@ export interface UpdateProfileInfoDto {
   name?: string;
   surname?: string;
   phoneNumber?: string;
+}
+export interface UserStats {
+  recipesCreated: number;
+  recipesLiked: number;
+  mealsPlanned: number;
+  shoppingListsGenerated: number;
+  followers: number;
+  following: number;
+  specialty?: string;
 }
 
 export interface UpdatePreferencesDto {
