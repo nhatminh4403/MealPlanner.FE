@@ -115,8 +115,14 @@ export const MOCK_USER: UserProfile = {
   surname: "User",
   email: "demo@example.com",
   avatarUrl: "https://i.pravatar.cc/150?u=demo",
-  followersCount: 145,
-  followingCount: 82
+  stats: {
+    followers: 145,
+    following: 82,
+    recipesCreated: 12,
+    recipesLiked: 45,
+    mealsPlanned: 8,
+    shoppingListsGenerated: 4
+  }
 };
 
 export const MOCK_TRENDING: TrendingRecipe[] = MOCK_RECIPES_SUMMARY.map(r => ({
