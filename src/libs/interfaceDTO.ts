@@ -163,8 +163,6 @@ export interface AddShoppingItemDto {
   category?: number;
 }
 
-// ── Nutrition ─────────────────────────────────────────────────────────────────
-
 export interface IngredientNutritionDto {
   id: string;
   name: string;
@@ -214,8 +212,6 @@ export interface UserProfile {
   email: string;
   avatarUrl?: string;
   stats: UserStats;
-  followersCount?: never; // remove these flat fields
-  followingCount?: never;
 }
 
 export interface UpdateProfileInfoDto {
