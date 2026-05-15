@@ -22,13 +22,20 @@ async function getServerLocalization() {
     return (resourceName: string, key: string) => key;
   }
 }
-// Replace the three Promise.allSettled calls with native fetch:
 async function getTopRated(): Promise<RecipeSummary[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/app/recipe/top-rated?count=8`,
-      { next: { revalidate: 300 } } // cache 5 min
+      { 
+        next: { revalidate: 300 },
+        signal: controller.signal
+      }
     );
+    clearTimeout(timeoutId);
+    
     if (!res.ok) return [];
     const json = await res.json();
     return json.data?.items ?? [];
@@ -39,10 +46,18 @@ async function getTopRated(): Promise<RecipeSummary[]> {
 
 async function getTrending(): Promise<TrendingRecipe[]> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/app/dashboard/trending`,
-      { next: { revalidate: 300 } }
+      { 
+        next: { revalidate: 300 },
+        signal: controller.signal
+      }
     );
+    clearTimeout(timeoutId);
+    
     if (!res.ok) return [];
     const json = await res.json();
     return json.data?.items ?? [];
