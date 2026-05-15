@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import {
   Sparkles,
   ArrowRight,

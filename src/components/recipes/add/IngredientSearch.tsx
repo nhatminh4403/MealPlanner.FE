@@ -5,7 +5,7 @@ import { ingredientNutritions } from "@/libs/api";
 import {
   IngredientNutritionDto,
   ExternalFoodCandidateDto,
-} from "@/libs/interfaceDTO";
+} from "@/libs/types";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -20,7 +20,7 @@ import {
   Check,
   Link2Off,
 } from "lucide-react";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 
 interface IngredientSearchProps {
   value: string;

@@ -11,7 +11,7 @@ import React, {
 import { notifications } from "@/libs/api";
 import { isAuthenticated } from "@/libs/axios";
 import { useHub } from "@/hooks/useHub";
-import { UserNotification } from "@/libs/interfaceDTO";
+import { UserNotification } from "@/libs/types";
 
 interface NotificationContextType {
   unreadCount: number;

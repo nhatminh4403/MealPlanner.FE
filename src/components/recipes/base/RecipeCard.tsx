@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Clock, ChefHat, Users, Flame } from "lucide-react";
-import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import type { RecipeSummary, TrendingRecipe } from "@/libs/types";
 import { Badge } from "@/components/ui/badge";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 
 const DIFFICULTY_LABEL_KEYS: Record<number, string> = {
   0: "Unit:Easy",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChefHat, Calendar, ShoppingCart, ArrowRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 
 interface FeatureCard {
   titleKey: string;

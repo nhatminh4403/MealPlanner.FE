@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ChefHat } from "lucide-react";
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AutoGenerateMealPlanDto } from "@/libs/interfaceDTO";
+import { AutoGenerateMealPlanDto } from "@/libs/types";
 import { X, Wand2, RefreshCw } from "lucide-react";
 import { createPortal } from "react-dom";
 

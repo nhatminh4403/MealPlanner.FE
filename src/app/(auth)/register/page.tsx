@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { register } from "@/libs/axios";
 import { toast } from "sonner";
 import axios from "axios";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 export default function Register() {

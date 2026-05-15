@@ -1,6 +1,6 @@
 // ── Imports ───────────────────────────────────────────────────────────────────
 
-import { AvailableLanguage } from "./enums";
+import { AvailableLanguage } from "../enums";
 
 // ── Base / Shared Types ───────────────────────────────────────────────────────
 

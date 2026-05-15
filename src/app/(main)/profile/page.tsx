@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { userProfiles, recipes as recipeApi } from "@/libs/api";
-import { UserProfile, RecipeSummary } from "@/libs/interfaceDTO";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { UserProfile, RecipeSummary } from "@/libs/types";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import {
   Settings,
   Mail,

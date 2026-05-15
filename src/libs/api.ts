@@ -32,7 +32,7 @@ import {
   ApplicationLocalizationResponse,
   ApplicationConfigurationResponse,
   GetShoppingListsInput,
-} from "./interfaceDTO";
+} from "./types";
 
 export const abpDefaultApis = {
   localization: (cultureName: AvailableLanguage) =>

@@ -9,7 +9,7 @@ import {
   ShoppingList,
   ShoppingListItem,
   DashboardStats,
-} from "../libs/interfaceDTO";
+} from "../libs/types";
 
 type HubEventHandlers = Partial<{
   onTrendingUpdated: () => void;

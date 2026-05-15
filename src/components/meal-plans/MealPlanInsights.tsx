@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MealPlan } from "@/libs/interfaceDTO";
+import { MealPlan } from "@/libs/types";
 
 interface MealPlanInsightsProps {
   userMealPlans: MealPlan | null;

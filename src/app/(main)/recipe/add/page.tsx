@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { recipes } from "@/libs/api";
-import { CreateRecipeDto } from "@/libs/interfaceDTO";
+import { CreateRecipeDto } from "@/libs/types";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
@@ -14,7 +14,7 @@ import { RecipeHeader } from "@/components/recipes/add/RecipeHeader";
 import { BasicInfoSection } from "@/components/recipes/add/BasicInfoSection";
 import { IngredientsSection } from "@/components/recipes/add/IngredientsSection";
 import { InstructionsSection } from "@/components/recipes/add/InstructionsSection";
-import { createEmptyRow, resolveRow } from "@/libs/ingredient-row-helpers";
+import { createEmptyRow, resolveRow } from "@/libs/utils/ingredient-helpers";
 import { IngredientRow } from "@/libs/recipe-form-types";
 import { mealPlans } from "@/libs/api";
 

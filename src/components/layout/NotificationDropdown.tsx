@@ -8,11 +8,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { notifications as notificationsApi } from "@/libs/api";
-import { UserNotification } from "@/libs/interfaceDTO";
+import { UserNotification } from "@/libs/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 import { formatDistanceToNow } from "date-fns";
-import { useNotifications } from "@/libs/NotificationProvider";
+import { useNotifications } from "@/libs/providers/NotificationProvider";
 import {
   Bell,
   CheckCheck,

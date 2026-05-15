@@ -10,7 +10,7 @@ import {
   Github,
   PlayCircle,
 } from "lucide-react";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 import { abpDefaultApis } from "@/libs/api";
 export function ApiDownModal() {
   const [visible, setVisible] = useState(false);

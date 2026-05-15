@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { dashboard } from "@/libs/api";
-import { DashboardStats, TrendingRecipe } from "@/libs/interfaceDTO";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { DashboardStats, TrendingRecipe } from "@/libs/types";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import {
   ChefHat,
   Users,

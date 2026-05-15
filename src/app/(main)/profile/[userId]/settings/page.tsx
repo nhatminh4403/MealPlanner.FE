@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { userSettings } from "@/libs/api";
-import { UserSettings, VisibilityLevel } from "@/libs/interfaceDTO";
+import { UserSettings, VisibilityLevel } from "@/libs/types";
 import { Bell, Shield, Palette, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";

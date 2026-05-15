@@ -2,7 +2,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MealPlanEntry } from "@/libs/interfaceDTO";
+import { MealPlanEntry } from "@/libs/types";
 import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 import { MealType } from "@/libs/enums";

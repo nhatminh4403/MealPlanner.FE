@@ -1,6 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import * as mockData from "./mockData";
-import { AbpApplicationConfiguration } from "./interfaceDTO";
+import { AbpApplicationConfiguration } from "./types";
 
 if (typeof process !== "undefined" && process.env.NODE_ENV === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";

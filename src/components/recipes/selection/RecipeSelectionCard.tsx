@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Plus, Star, Clock, Flame } from "lucide-react";
-import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import { RecipeSummary, TrendingRecipe } from "@/libs/types";
 
 interface RecipeSelectionCardProps {
   recipe: RecipeSummary | TrendingRecipe;

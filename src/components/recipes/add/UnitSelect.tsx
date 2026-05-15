@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { UNITS, UNITS_BY_CATEGORY } from "@/libs/unit-conversion";
-import { Unit } from "@/libs/interfaceDTO";
+import { UNITS, UNITS_BY_CATEGORY } from "@/libs/utils/unit-conversion";
+import { Unit } from "@/libs/types";
 import {
   Select,
   SelectContent,
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 
 interface UnitSelectProps {
   value: Unit | null;

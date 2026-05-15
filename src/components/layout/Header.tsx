@@ -7,10 +7,10 @@ import React, { useState, useRef, useEffect, useTransition } from "react";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { logout, isAuthenticated } from "@/libs/axios";
 import { userProfiles } from "@/libs/api";
-import { UserProfile } from "@/libs/interfaceDTO";
-import { useTheme } from "@/libs/ThemeProvider";
+import { UserProfile } from "@/libs/types";
+import { useTheme } from "@/libs/providers/ThemeProvider";
 import { Sun, Moon } from "lucide-react";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 
 const NAV_LINK_DEFS = [
   { href: "/", labelKey: "Menu:Home" },

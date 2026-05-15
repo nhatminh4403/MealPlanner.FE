@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { Plus, Trash2, AlertCircle, Scale } from "lucide-react";
 import {
   Card,
@@ -13,13 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IngredientRow } from "@/libs/recipe-form-types";
-import { IngredientNutritionDto } from "@/libs/interfaceDTO";
-import { Unit } from "@/libs/interfaceDTO";
+import { IngredientNutritionDto } from "@/libs/types";
+import { Unit } from "@/libs/types";
 import { UnitSelect } from "./UnitSelect";
 import { IngredientSearch } from "./IngredientSearch";
 import { DensitySelector } from "./DensitySelector";
-import { resolveRow } from "@/libs/ingredient-row-helpers";
-import { cn } from "@/libs/utils";
+import { resolveRow } from "@/libs/utils/ingredient-helpers";
+import { cn } from "@/libs/utils/index";
 
 interface IngredientsSectionProps {
   ingredients: IngredientRow[];

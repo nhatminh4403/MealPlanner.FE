@@ -7,7 +7,7 @@ import {
   ShoppingList,
   TrendingRecipe,
   PagedResult
-} from "./interfaceDTO";
+} from "./types";
 
 export const MOCK_RECIPES_SUMMARY: RecipeSummary[] = [
   {

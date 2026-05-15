@@ -1,6 +1,6 @@
 "use client";
 
-import type { RecipeSummary } from "@/libs/interfaceDTO";
+import type { RecipeSummary } from "@/libs/types";
 import RecipeCard from "./RecipeCard";
 
 interface RecipeCardGridProps {

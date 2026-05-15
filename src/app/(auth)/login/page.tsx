@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { login } from "@/libs/axios";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {

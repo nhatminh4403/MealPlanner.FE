@@ -3,8 +3,8 @@
 import { ChefHat, Users, Star, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useLocalization } from "@/libs/LocalizationProvider";
-import type { DashboardStats } from "@/libs/interfaceDTO";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
+import type { DashboardStats } from "@/libs/types";
 
 export interface StatsStripProps {
   stats: DashboardStats | null;

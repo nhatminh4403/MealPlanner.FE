@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { notifications } from "@/libs/api";
-import { UserNotification } from "@/libs/interfaceDTO";
+import { UserNotification } from "@/libs/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 import { formatDistanceToNow } from "date-fns";
 import {
   Inbox,
@@ -17,10 +17,10 @@ import {
   GripHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useNotifications } from "@/libs/NotificationProvider";
+import { useNotifications } from "@/libs/providers/NotificationProvider";
 import { isAuthenticated } from "@/libs/axios";
 import { useRouter } from "next/navigation";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { AppPageHeader } from "@/components/layout/AppPageHeader";
 
 const TYPE_CONFIG: Record<

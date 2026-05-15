@@ -1,6 +1,6 @@
 // ── Unit definitions ──────────────────────────────────────────────────────────
 
-import { Unit } from "./interfaceDTO";
+import { Unit } from "../types";
 
 export const UNITS: Unit[] = [
   // ── Weight (exact) ──────────────────────────────────────────────────────────

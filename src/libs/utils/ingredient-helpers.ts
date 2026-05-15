@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { UNITS, toGrams, toDisplayQuantity } from "./unit-conversion";
-import { IngredientRow, ConversionStatus } from "./recipe-form-types";
-import { Unit } from "./interfaceDTO";
+import { IngredientRow, ConversionStatus } from "../recipe-form-types";
+import { Unit } from "../types";
 
 export function createEmptyRow(): IngredientRow {
   const defaultUnit = UNITS.find((u) => u.label === "g")!;

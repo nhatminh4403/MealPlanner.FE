@@ -3,7 +3,7 @@
 import React from "react";
 import RecipeCard from "./RecipeCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import type { RecipeSummary, TrendingRecipe } from "@/libs/types";
 
 interface RecipeSectionProps {
   title: string;

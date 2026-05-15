@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { AvailableLanguage } from "@/libs/enums";
 import { Globe, Loader2 } from "lucide-react";
 

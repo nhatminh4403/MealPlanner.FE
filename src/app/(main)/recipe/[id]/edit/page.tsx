@@ -3,18 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { recipes as recipeApi } from "@/libs/api";
-import type { Recipe, CreateRecipeDto } from "@/libs/interfaceDTO";
+import type { Recipe, CreateRecipeDto } from "@/libs/types";
 import { toast } from "sonner";
 import axios from "axios";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { Loader2, ArrowLeft, Save, ChefHat, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BasicInfoSection } from "@/components/recipes/add/BasicInfoSection";
 import { IngredientsSection } from "@/components/recipes/add/IngredientsSection";
 import { InstructionsSection } from "@/components/recipes/add/InstructionsSection";
-import { createEmptyRow, resolveRow } from "@/libs/ingredient-row-helpers";
+import { createEmptyRow, resolveRow } from "@/libs/utils/ingredient-helpers";
 import { IngredientRow } from "@/libs/recipe-form-types";
-import { UNITS } from "@/libs/unit-conversion";
+import { UNITS } from "@/libs/utils/unit-conversion";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Search } from "lucide-react";
-import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import { RecipeSummary, TrendingRecipe } from "@/libs/types";
 import RecipeSelectionCard from "./RecipeSelectionCard";
 
 interface RecipeSelectionGridProps {

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { recipes as recipeApi, userProfiles } from "@/libs/api";
 import { isAuthenticated } from "@/libs/axios";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { toast } from "sonner";
 
 interface RecipeOwnerActionsProps {

@@ -9,7 +9,7 @@ import RecipeSection from "@/components/recipes/base/RecipeSection";
 import { Star, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import { RecipeSummary, TrendingRecipe } from "@/libs/types";
 
 async function getServerLocalization() {
   try {

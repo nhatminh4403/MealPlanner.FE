@@ -6,7 +6,7 @@ import { CalendarPlus, Sparkles, ArrowRight, CalendarDays } from "lucide-react";
 import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { AppSection } from "@/components/layout/AppSection";
 import { Button } from "@/components/ui/button";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 
 export default function AddMealPlanPage() {
   const { L } = useLocalization();

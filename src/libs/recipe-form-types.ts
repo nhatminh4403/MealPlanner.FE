@@ -1,6 +1,6 @@
 // libs/recipe-form-types.ts  (new file)
-import { Unit } from "./interfaceDTO";
-import { IngredientNutritionDto } from "./interfaceDTO";
+import { Unit } from "./types";
+import { IngredientNutritionDto } from "./types";
 
 export type ConversionStatus = "ok" | "needs-density" | "needs-grams" | "empty";
 

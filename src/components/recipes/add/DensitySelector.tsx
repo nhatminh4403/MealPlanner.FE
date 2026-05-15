@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { DENSITY_PRESETS } from "@/libs/unit-conversion";
+import { DENSITY_PRESETS } from "@/libs/utils/unit-conversion";
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/libs/utils";
+import { cn } from "@/libs/utils/index";
 
 interface DensitySelectorProps {
   value: number;

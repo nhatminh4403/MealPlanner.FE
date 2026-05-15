@@ -2,10 +2,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Plus, ShoppingCart, Trash2, Check, ShoppingBag } from "lucide-react";
 import { shoppingLists, userProfiles } from "@/libs/api";
-import { ShoppingList } from "@/libs/interfaceDTO";
+import { ShoppingList } from "@/libs/types";
 import { ShoppingListCategory } from "@/libs/enums";
 import { toast } from "sonner";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { AppPageHeader } from "@/components/layout/AppPageHeader";
 
 export default function ShoppingListsPage() {

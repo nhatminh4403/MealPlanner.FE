@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChefHat, Trophy, Flame, Globe } from "lucide-react";
 import { recipes, mealPlans, userProfiles, dashboard } from "@/libs/api";
-import { RecipeSummary, TrendingRecipe } from "@/libs/interfaceDTO";
+import { RecipeSummary, TrendingRecipe } from "@/libs/types";
 import { toast } from "sonner";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { MealType, DayOfWeek } from "@/libs/enums";

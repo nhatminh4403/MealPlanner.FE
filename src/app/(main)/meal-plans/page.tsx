@@ -3,7 +3,7 @@ import { RefreshCw, Plus, CalendarDays, Sparkles } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getAccessToken } from "@/libs/axios";
-import { MealPlan, AutoGenerateMealPlanDto } from "@/libs/interfaceDTO";
+import { MealPlan, AutoGenerateMealPlanDto } from "@/libs/types";
 import { mealPlans, userProfiles } from "@/libs/api";
 import { useHub } from "@/hooks/useHub";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { MealPlanDayCard } from "../../../components/meal-plans/MealPlanDayCard"
 import { MealPlanInsights } from "../../../components/meal-plans/MealPlanInsights";
 import { MealPlanSkeleton } from "../../../components/meal-plans/MealPlanSkeleton";
 import { AutoGenerateModal } from "../../../components/meal-plans/AutoGenerateModal";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 import { AppPageHeader } from "@/components/layout/AppPageHeader";
 import { AppSection } from "@/components/layout/AppSection";
 

@@ -7,7 +7,7 @@ import { recipes as recipeApi } from "@/libs/api";
 import { userProfiles } from "@/libs/api";
 import { getAccessToken } from "@/libs/axios";
 import RecipeCard from "../../../components/recipes/base/RecipeCard";
-import type { RecipeSummary } from "@/libs/interfaceDTO";
+import type { RecipeSummary } from "@/libs/types";
 import { User, Search, LayoutGrid } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { useLocalization } from "@/libs/LocalizationProvider";
+import { useLocalization } from "@/libs/providers/LocalizationProvider";
 
 const PAGE_SIZE = 10;
 
