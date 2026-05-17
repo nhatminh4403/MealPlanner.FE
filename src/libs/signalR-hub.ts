@@ -11,36 +11,30 @@ const DOCKER_HUB_URL = `${DOCKER_API_URL}/signalr-hubs/meal-planner`;
 let connection: signalR.HubConnection | null = null;
 let dockerConnection: signalR.HubConnection | null = null;
 
+const createConnection = (url: string): signalR.HubConnection => {
+  return new signalR.HubConnectionBuilder()
+    .withUrl(url, {
+      accessTokenFactory: () => getAccessToken() ?? "",
+    })
+    .withAutomaticReconnect()
+    .configureLogging(
+      process.env.NODE_ENV === "development"
+        ? signalR.LogLevel.Information
+        : signalR.LogLevel.Error,
+    )
+    .build();
+};
+
 export const getHubConnection = (): signalR.HubConnection => {
   if (!connection) {
-    connection = new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL, {
-        accessTokenFactory: () => getAccessToken() ?? "",
-      })
-      .withAutomaticReconnect()
-      .configureLogging(
-        process.env.NODE_ENV === "development"
-          ? signalR.LogLevel.Information
-          : signalR.LogLevel.Error,
-      )
-      .build();
+    connection = createConnection(HUB_URL);
   }
   return connection;
 };
 
 export const getDockerHubConnection = (): signalR.HubConnection => {
   if (!dockerConnection) {
-    dockerConnection = new signalR.HubConnectionBuilder()
-      .withUrl(DOCKER_HUB_URL, {
-        accessTokenFactory: () => getAccessToken() ?? "",
-      })
-      .withAutomaticReconnect()
-      .configureLogging(
-        process.env.NODE_ENV === "development"
-          ? signalR.LogLevel.Information
-          : signalR.LogLevel.Error,
-      )
-      .build();
+    dockerConnection = createConnection(DOCKER_HUB_URL);
   }
   return dockerConnection;
 };
@@ -66,6 +60,8 @@ export const startHub = async (): Promise<void> => {
 };
 
 export const startDockerHub = async (): Promise<void> => {
+  const token = getAccessToken();
+  if (!token) return;
   const hub = getDockerHubConnection();
   if (hub.state === signalR.HubConnectionState.Disconnected) {
     if (!startDockerPromise) {

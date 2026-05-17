@@ -30,13 +30,14 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined,
 );
 
+const typeMap: Record<number, string> = {
+  0: "Default",
+  1: "MealReminder",
+  2: "RecipeUpdate",
+  3: "ShoppingListAlert",
+};
+
 function normalize(dto: UserNotification): UserNotification {
-  const typeMap: Record<number, string> = {
-    0: "Default",
-    1: "MealReminder",
-    2: "RecipeUpdate",
-    3: "ShoppingListAlert",
-  };
   return {
     ...dto,
     type: typeMap[dto.type as unknown as number] ?? "Default",
@@ -53,9 +54,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     const init = async () => {
       try {
-        const [listRes] = await Promise.all([
-          notifications.getList({ maxResultCount: 20 }),
-        ]);
+        const listRes = await notifications.getList({ maxResultCount: 20 });
         setUnreadCount(listRes.data.totalCount);
         setRecentItems(listRes.data.items);
       } catch (err) {

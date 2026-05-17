@@ -295,7 +295,7 @@ export function ApiDownModal() {
                     Reason for Pause
                   </h3>
                   <p className="text-sm text-[var(--muted-fg)] italic leading-relaxed">
-                    free monly database usage ran out
+                    Free monly database usage ran out
                   </p>
                 </div>
 

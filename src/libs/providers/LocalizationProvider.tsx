@@ -8,18 +8,9 @@ import {
 } from "react";
 import { abpDefaultApis } from "@/libs/api";
 import { AvailableLanguage } from "@/libs/enums";
+import { ApplicationLocalizationResponse } from "../types";
 
 const LOCALE_STORAGE_KEY = "preferred_locale";
-
-const VALID_LOCALES = new Set<string>(Object.values(AvailableLanguage));
-
-function getSavedLocale(): AvailableLanguage {
-  if (typeof window === "undefined") return AvailableLanguage.en;
-  const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
-  if (saved && VALID_LOCALES.has(saved)) return saved as AvailableLanguage;
-  return AvailableLanguage.en;
-}
-
 type ResourceMap = Record<string, Record<string, string>>;
 
 interface LocalizationContextValue {
@@ -36,52 +27,72 @@ const LocalizationContext = createContext<LocalizationContextValue>({
   isLoading: true,
 });
 
+interface LocalizationProviderProps {
+  children: React.ReactNode;
+  initialData?: ApplicationLocalizationResponse | null;
+  initialLocale?: AvailableLanguage;
+}
+
+function buildResourceMap(data: ApplicationLocalizationResponse): ResourceMap {
+  const map: ResourceMap = {};
+  Object.entries(data.resources).forEach(([name, resource]) => {
+    map[name] = (resource as { texts: Record<string, string> }).texts;
+  });
+  return map;
+}
+
 export function LocalizationProvider({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  // Start with "en" for SSR, then sync from localStorage after mount
-  const [locale, setLocaleState] = useState<AvailableLanguage>(AvailableLanguage.en);
-  const [resourceMap, setResourceMap] = useState<ResourceMap>({});
-  const [isLoading, setIsLoading] = useState(true);
+  initialData,
+  initialLocale,
+}: LocalizationProviderProps) {
+  const [locale, setLocaleState] = useState<AvailableLanguage>(
+    initialLocale ?? AvailableLanguage.en,
+  );
+  const [resourceMap, setResourceMap] = useState<ResourceMap>(() =>
+    initialData ? buildResourceMap(initialData) : {},
+  );
+  // Tracks which locale is in-flight; null = idle
+  const [fetchingLocale, setFetchingLocale] = useState<AvailableLanguage | null>(
+    initialData ? null : (initialLocale ?? AvailableLanguage.en),
+  );
 
-  // Hydrate locale from localStorage on first mount
-  useEffect(() => {
-    const saved = getSavedLocale();
-    if (saved !== locale) setLocaleState(saved);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const isLoading = fetchingLocale !== null;
 
-  // Persist + apply locale changes
   const setLocale = useCallback((lang: AvailableLanguage) => {
     localStorage.setItem(LOCALE_STORAGE_KEY, lang);
+    document.cookie = `preferred_locale=${lang}; path=/; max-age=31536000; SameSite=Lax`;
     setLocaleState(lang);
-  }, []);
+    
+    if (lang === initialLocale && initialData) {
+      // Avoid triggering the fetch effect entirely, and restore original data
+      setResourceMap(buildResourceMap(initialData));
+      setFetchingLocale(null);
+    } else {
+      setFetchingLocale(lang);
+    }
+  }, [initialLocale, initialData]);
 
   useEffect(() => {
+    if (fetchingLocale === null) return;
+
     let cancelled = false;
-    setIsLoading(true);
 
     abpDefaultApis
-      .localization(locale)
+      .localization(fetchingLocale)
       .then((res) => {
         if (cancelled) return;
-        const map: ResourceMap = {};
-        Object.entries(res.data.resources).forEach(([name, resource]) => {
-          map[name] = (resource as { texts: Record<string, string> }).texts;
-        });
-        setResourceMap(map);
+        setResourceMap(buildResourceMap(res.data));
       })
       .catch(console.error)
       .finally(() => {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) setFetchingLocale(null);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [locale]);
+  }, [fetchingLocale, initialLocale, initialData]);
 
   const L = useCallback(
     (resourceName: string, key: string) =>

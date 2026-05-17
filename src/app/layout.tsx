@@ -10,6 +10,8 @@ import Footer from "@/components/layout/Footer";
 import { Toaster } from "sonner";
 import { ApiDownModal } from "@/components/layout/ApiDownModal";
 import AppInitializer from "@/libs/providers/AppInitializer";
+import { cookies } from "next/headers";
+import { AvailableLanguage } from "@/libs/enums";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +27,26 @@ export const metadata: Metadata = {
   title: "Meal Planner",
   description: "Your personalized dashboard and recipe management system",
 };
-
-export default function RootLayout({
+async function fetchLocalization(cultureName = "en") {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/abp/application-localization?cultureName=${cultureName}`,
+      { next: { revalidate: 3600 } } // cache 1 hour
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  const cookieStore = await cookies();
+  const culture = (cookieStore.get("preferred_locale")?.value ?? "en") as AvailableLanguage;
+  const localizationData = await fetchLocalization(culture);  return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script
@@ -57,7 +72,7 @@ export default function RootLayout({
         <ApiDownModal />
         <AppInitializer />
         <ThemeProvider>
-          <LocalizationProvider>
+          <LocalizationProvider  initialData={localizationData}>
             <NotificationProvider>
               <div className="relative flex min-h-screen flex-col font-sans">
                 <div className="bg-gradient-mesh pointer-events-none fixed inset-0 z-0" />

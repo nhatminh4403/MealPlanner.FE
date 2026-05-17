@@ -10,18 +10,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:44338";
 const DOCKER_API_URL =
   process.env.NEXT_PUBLIC_DOCKER_API_URL || "https://localhost:44339";
 
-export const api = axios.create({
-  baseURL: `${API_URL}/api`,
+const createApiInstance = (baseURL: string) => axios.create({
+  baseURL: `${baseURL}/api`,
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
 
-export const dockerApi = axios.create({
-  baseURL: `${DOCKER_API_URL}/api`,
-  headers: { "Content-Type": "application/json" },
-  timeout: 10000,
-});
-
+export const api = createApiInstance(API_URL);
+export const dockerApi = createApiInstance(DOCKER_API_URL);
 // ── Demo Mode helpers ─────────────────────────────────────────────────────────
 
 const DEMO_MODE_KEY = "use_demo_mode";
@@ -62,8 +58,6 @@ const unwrapInterceptor = (response: AxiosResponse) => {
   }
   return response;
 };
-api.interceptors.response.use(unwrapInterceptor);
-dockerApi.interceptors.response.use(unwrapInterceptor);
 const responseInterceptorError = async (error: AxiosError) => {
   if (isDemoMode()) {
     return Promise.reject(error); 
@@ -136,14 +130,15 @@ const mockInterceptor = async (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-// // Apply interceptors
-// api.interceptors.request.use(mockInterceptor);
-api.interceptors.request.use(requestInterceptor);
-api.interceptors.response.use((res) => res, responseInterceptorError);
+// Apply interceptors
+const setupInterceptors = (instance: ReturnType<typeof axios.create>) => {
+  // instance.interceptors.request.use(mockInterceptor);
+  instance.interceptors.request.use(requestInterceptor);
+  instance.interceptors.response.use(unwrapInterceptor, responseInterceptorError);
+};
 
-// dockerApi.interceptors.request.use(mockInterceptor);
-dockerApi.interceptors.request.use(requestInterceptor);
-dockerApi.interceptors.response.use((res) => res, responseInterceptorError);
+setupInterceptors(api);
+setupInterceptors(dockerApi);
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
