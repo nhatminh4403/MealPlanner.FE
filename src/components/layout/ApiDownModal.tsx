@@ -295,8 +295,7 @@ export function ApiDownModal() {
                     Reason for Pause
                   </h3>
                   <p className="text-sm text-[var(--muted-fg)] italic leading-relaxed">
-                    &ldquo;My back is so damn painful! I&apos;m waiting for the
-                    new replacement for my current swivel chair base &rdquo;
+                    free monly database usage ran out
                   </p>
                 </div>
 
